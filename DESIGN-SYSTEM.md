@@ -18,27 +18,27 @@ Todas as cores do projeto seguem o padrão Tailwind CSS usando classes utilitár
 
 ### Paleta de Cores Principais
 
-- **Background**: 
-  - `bg-dark-900` (#0A0A0A) - Fundo principal
-  - `bg-[#111]` - Fundo secundário (cards)
-  - `bg-[#1A1A1A]` - Fundo terciário
-  - `bg-zinc-800` - Elementos hover
+- **Background**:
+  - `bg-background` (#0A0A0A) - Fundo principal
+  - `bg-card` - Fundo secundário (cards)
+  - `bg-background-secondary-subtle` - Fundo terciário
+  - `bg-background-secondary` - Elementos hover
 
-- **Borders**: 
-  - `border-zinc-800` - Borda padrão
-  - `border-zinc-600` - Borda hover
-  - `border-white/5` - Borda sutil
+- **Borders**:
+  - `border-border` - Borda padrão
+  - `border-muted` - Borda hover
+  - `border-subtle` - Borda sutil
 
-- **Text**: 
-  - `text-white` - Texto principal
-  - `text-zinc-400` - Texto secundário
-  - `text-zinc-500` - Texto terciário
-  - `text-zinc-600` - Texto muted
+- **Text**:
+  - `text-foreground` - Texto principal
+  - `text-muted-foreground` - Texto secundário
+  - `text-muted-secondary` - Texto terciário
+  - `text-muted` - Texto muted
 
-- **Brand** (Blue): 
-  - `bg-blue-600` / `text-blue-600` - Primária
-  - `bg-blue-700` / `text-blue-700` - Hover
-  - `bg-blue-500` / `text-blue-500` - Destaque
+- **Brand** (Blue):
+  - `bg-primary` / `text-primary` - Primária
+  - `bg-primary-hover` / `text-primary-hover` - Hover
+  - `bg-primary-destaque` / `text-primary-destaque` - Destaque
 
 ## 🔘 Componente Button
 
@@ -47,33 +47,47 @@ O novo componente Button é totalmente escalável com múltiplas variantes e tam
 ### Importação
 
 ```typescript
-import Button from '../ui/Button';
-import { ArrowRight, Plus, Search } from 'lucide-react';
+import Button from "../ui/Button"
+import { ArrowRight, Plus, Search } from "lucide-react"
 ```
 
 ### Variantes
 
 ```tsx
-{/* Primary - Ação principal */}
-<Button variant="primary">Botão Primary</Button>
+{
+  /* Primary - Ação principal */
+}
+;<Button variant="primary">Botão Primary</Button>
 
-{/* Secondary - Ação secundária */}
-<Button variant="secondary">Botão Secondary</Button>
+{
+  /* Secondary - Ação secundária */
+}
+;<Button variant="secondary">Botão Secondary</Button>
 
-{/* Outline - Ação com borda */}
-<Button variant="outline">Botão Outline</Button>
+{
+  /* Outline - Ação com borda */
+}
+;<Button variant="outline">Botão Outline</Button>
 
-{/* Outline Blue - Destaque azul */}
-<Button variant="outline-blue">Botão Outline Blue</Button>
+{
+  /* Outline Blue - Destaque azul */
+}
+;<Button variant="outline-blue">Botão Outline Blue</Button>
 
-{/* Ghost - Ação sutil */}
-<Button variant="ghost">Botão Ghost</Button>
+{
+  /* Ghost - Ação sutil */
+}
+;<Button variant="ghost">Botão Ghost</Button>
 
-{/* Danger - Ação destrutiva */}
-<Button variant="danger">Deletar</Button>
+{
+  /* Danger - Ação destrutiva */
+}
+;<Button variant="danger">Deletar</Button>
 
-{/* Success - Ação de sucesso */}
-<Button variant="success">Confirmar</Button>
+{
+  /* Success - Ação de sucesso */
+}
+;<Button variant="success">Confirmar</Button>
 ```
 
 ### Tamanhos
@@ -88,19 +102,22 @@ import { ArrowRight, Plus, Search } from 'lucide-react';
 ### Ícones
 
 ```tsx
-{/* Ícone à direita (padrão) */}
-<Button icon={ArrowRight}>Ver mais</Button>
+{
+  /* Ícone à direita (padrão) */
+}
+;<Button icon={ArrowRight}>Ver mais</Button>
 
-{/* Ícone à esquerda */}
-<Button icon={Plus} iconPosition="left">Adicionar</Button>
+{
+  /* Ícone à esquerda */
+}
+;<Button icon={Plus} iconPosition="left">
+  Adicionar
+</Button>
 
-{/* Ícone com variante e tamanho */}
-<Button 
-  variant="outline-blue" 
-  size="lg" 
-  icon={Search} 
-  iconPosition="left"
->
+{
+  /* Ícone com variante e tamanho */
+}
+;<Button variant="outline-blue" size="lg" icon={Search} iconPosition="left">
   Buscar projetos
 </Button>
 ```
@@ -108,23 +125,29 @@ import { ArrowRight, Plus, Search } from 'lucide-react';
 ### Estados
 
 ```tsx
-{/* Desabilitado */}
-<Button disabled>Botão Desabilitado</Button>
+{
+  /* Desabilitado */
+}
+;<Button disabled>Botão Desabilitado</Button>
 
-{/* Loading */}
-<Button loading>Carregando...</Button>
+{
+  /* Loading */
+}
+;<Button loading>Carregando...</Button>
 
-{/* Full Width */}
-<Button fullWidth>Botão Largura Total</Button>
+{
+  /* Full Width */
+}
+;<Button fullWidth>Botão Largura Total</Button>
 ```
 
 ### Exemplos Completos
 
 ```tsx
 // Botão de ação principal com ícone
-<Button 
-  variant="primary" 
-  size="lg" 
+<Button
+  variant="primary"
+  size="lg"
   icon={ArrowRight}
   onClick={handleClick}
 >
@@ -132,9 +155,9 @@ import { ArrowRight, Plus, Search } from 'lucide-react';
 </Button>
 
 // Botão secundário pequeno
-<Button 
-  variant="secondary" 
-  size="sm" 
+<Button
+  variant="secondary"
+  size="sm"
   icon={Plus}
   iconPosition="left"
 >
@@ -142,8 +165,8 @@ import { ArrowRight, Plus, Search } from 'lucide-react';
 </Button>
 
 // Botão outline blue com loading
-<Button 
-  variant="outline-blue" 
+<Button
+  variant="outline-blue"
   loading={isLoading}
   onClick={handleSubmit}
 >
@@ -151,8 +174,8 @@ import { ArrowRight, Plus, Search } from 'lucide-react';
 </Button>
 
 // Botão danger full width
-<Button 
-  variant="danger" 
+<Button
+  variant="danger"
   fullWidth
   onClick={handleDelete}
 >
@@ -177,15 +200,12 @@ Para adicionar uma nova variante de botão:
 3. Adicione o estilo no objeto `variants`
 
 ```typescript
-export type ButtonVariant = 
-  | 'primary' 
-  | 'secondary' 
-  | 'sua-nova-variante'; // ← Adicione aqui
+export type ButtonVariant = "primary" | "secondary" | "sua-nova-variante" // ← Adicione aqui
 
 const variants: Record<ButtonVariant, string> = {
   // ...outras variantes
-  'sua-nova-variante': "bg-purple-600 hover:bg-purple-700 text-white", // ← Estilo aqui
-};
+  "sua-nova-variante": "bg-purple-600 hover:bg-purple-700 text-foreground", // ← Estilo aqui
+}
 ```
 
 ---
