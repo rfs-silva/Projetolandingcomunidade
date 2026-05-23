@@ -1,17 +1,32 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { LogOut } from 'lucide-react'
+import {
+  ArrowRight,
+  LogOut,
+  Pencil,
+  Sparkles,
+  Users,
+  Lightbulb,
+  FolderGit2,
+} from 'lucide-react'
 import { auth, signOut } from '@/auth'
 import { Button } from '@/components/ui/button'
 import { UserAvatar } from '@/components/ui/UserAvatar'
 import { profileService } from '@/server/services/profile.service'
 
 export const metadata = {
-  title: 'Dashboard · Comunidade Roraima',
+  title: 'Painel · Comunidade Roraima',
 }
 
 export const dynamic = 'force-dynamic'
+
+const PROFILE_TYPE_LABEL: Record<string, string> = {
+  MEMBER: 'Membro',
+  COMPANY: 'Empresa parceira',
+  LEADER: 'Liderança',
+  FOUNDER: 'Fundador',
+}
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -20,7 +35,7 @@ export default async function DashboardPage() {
   const onboarded = await profileService.hasCompletedOnboarding(session.user.id)
   if (!onboarded) redirect('/onboarding')
 
-  const profile = await profileService.getByUserId(session.user.id)
+  const profile = await profileService.getDtoByUserId(session.user.id)
   const user = session.user
 
   return (
@@ -35,12 +50,12 @@ export default async function DashboardPage() {
           </Link>
           <div className="flex items-center gap-4">
             <UserAvatar
-              src={user?.image}
-              name={profile?.displayName ?? user?.name ?? user?.githubUsername}
-              seed={user?.githubUsername ?? user?.id ?? user?.name}
+              src={user.image}
+              name={profile.displayName}
+              seed={user.githubUsername ?? user.id}
             />
             <span className="hidden sm:inline text-sm text-muted-foreground">
-              {profile?.displayName ?? user?.name ?? user?.githubUsername}
+              {profile.displayName}
             </span>
             <form
               action={async () => {
@@ -62,42 +77,138 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-7xl px-6 py-12">
+      <section className="mx-auto max-w-7xl px-6 py-10">
         <h1 className="text-3xl font-semibold text-foreground">
-          Olá, {profile?.displayName ?? user?.name ?? user?.githubUsername} 👋
+          Olá, {profile.displayName.split(' ')[0]} 👋
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Bem-vindo à área exclusiva da comunidade. As próximas funcionalidades
-          (perfil, mural, mentoria, projetos) chegam nos próximos sprints.
+          Sua área de membro. Mantenha seu perfil atualizado para que outros
+          devs te encontrem.
         </p>
 
-        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            {
-              title: 'Mural de Membros',
-              desc: 'Descubra outros devs da comunidade (Sprint 3).',
-            },
-            {
-              title: 'Mentoria',
-              desc: 'Candidate-se ao programa de mentoria (Sprint 3).',
-            },
-            {
-              title: 'Mural de Projetos',
-              desc: 'Publique e descubra projetos da comunidade (Sprint 3).',
-            },
-          ].map((card) => (
-            <div
-              key={card.title}
-              className="rounded-2xl border border-subtle bg-card p-6"
-            >
-              <h2 className="text-lg font-medium text-foreground">
-                {card.title}
-              </h2>
-              <p className="mt-2 text-sm text-muted-foreground">{card.desc}</p>
+        <div className="mt-10 rounded-2xl border border-subtle bg-card p-6 md:p-8">
+          <div className="flex flex-col md:flex-row md:items-center gap-6">
+            <UserAvatar
+              size="lg"
+              src={user.image}
+              name={profile.displayName}
+              seed={user.githubUsername ?? user.id}
+            />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-xl font-semibold text-foreground">
+                  {profile.displayName}
+                </h2>
+                <span className="text-xs uppercase tracking-wider text-primary-destaque bg-primary/10 border border-primary/30 px-2 py-0.5 rounded-full">
+                  {PROFILE_TYPE_LABEL[profile.type] ?? profile.type}
+                </span>
+              </div>
+              {profile.bio ? (
+                <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+                  {profile.bio}
+                </p>
+              ) : (
+                <p className="mt-2 text-sm text-muted-foreground italic">
+                  Sem bio — conte um pouco sobre você.
+                </p>
+              )}
+
+              {profile.tags.length > 0 ? (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {profile.tags.slice(0, 8).map((tag) => (
+                    <span
+                      key={tag.id}
+                      className="text-[10px] uppercase tracking-wider px-2 py-1 rounded bg-background-secondary text-muted-foreground border border-zinc-700/50"
+                    >
+                      {tag.label}
+                    </span>
+                  ))}
+                  {profile.tags.length > 8 ? (
+                    <span className="text-[10px] text-muted-foreground self-center">
+                      +{profile.tags.length - 8}
+                    </span>
+                  ) : null}
+                </div>
+              ) : (
+                <p className="mt-3 text-xs text-muted-foreground">
+                  Adicione tags no seu perfil para aparecer no mural.
+                </p>
+              )}
             </div>
-          ))}
+            <Link href="/dashboard/profile" className="shrink-0">
+              <Button
+                type="button"
+                variant="outline-primary"
+                icon={<Pencil size={16} />}
+                iconPosition="left"
+                className="w-full md:w-auto h-10"
+              >
+                Editar perfil
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        <h3 className="mt-12 mb-4 text-sm uppercase tracking-wider text-muted-foreground">
+          Em breve
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <ComingSoonCard
+            icon={<Users size={20} />}
+            title="Mural de membros"
+            desc="Descubra devs por stack e tipo de perfil."
+          />
+          <ComingSoonCard
+            icon={<Lightbulb size={20} />}
+            title="Mentoria"
+            desc="Candidate-se ao programa de mentoria."
+          />
+          <ComingSoonCard
+            icon={<FolderGit2 size={20} />}
+            title="Mural de projetos"
+            desc="Publique e descubra projetos da comunidade."
+          />
+        </div>
+
+        <div className="mt-10 rounded-2xl border border-primary/30 bg-primary/5 p-6 flex flex-col md:flex-row md:items-center gap-4">
+          <Sparkles size={20} className="text-primary-destaque shrink-0" />
+          <p className="text-sm text-foreground flex-1">
+            Seu perfil está pronto para o mural. Quanto mais tags relevantes,
+            mais fácil ser encontrado por outros devs.
+          </p>
+          <Link href="/dashboard/profile" className="shrink-0">
+            <Button
+              type="button"
+              variant="default"
+              icon={<ArrowRight size={16} />}
+              iconPosition="right"
+              size="sm"
+            >
+              Completar perfil
+            </Button>
+          </Link>
         </div>
       </section>
     </main>
+  )
+}
+
+function ComingSoonCard({
+  icon,
+  title,
+  desc,
+}: {
+  icon: React.ReactNode
+  title: string
+  desc: string
+}) {
+  return (
+    <div className="rounded-2xl border border-subtle bg-card p-6 opacity-70">
+      <div className="w-10 h-10 rounded-lg bg-background-secondary border border-subtle flex items-center justify-center text-muted-foreground mb-3">
+        {icon}
+      </div>
+      <h4 className="text-base font-medium text-foreground">{title}</h4>
+      <p className="mt-1 text-sm text-muted-foreground">{desc}</p>
+    </div>
   )
 }
