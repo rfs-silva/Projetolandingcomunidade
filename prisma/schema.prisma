@@ -1,0 +1,215 @@
+// Schema do MVP - Comunidade Roraima Devs
+// Cobre: users, profiles, tags, events, challenges, projects, mentorship.
+// Tabelas anotadas com [E1..E7] indicam o epico que primeiro as consome.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum EventType {
+  REMOTO
+  PRESENCIAL
+}
+
+enum Visibility {
+  PUBLIC
+  MEMBERS
+}
+
+enum ProjectCategoryDb {
+  FRONTEND
+  BACKEND
+  MOBILE
+  FULLSTACK
+}
+
+enum ProfileType {
+  MEMBER
+  COMPANY
+  LEADER
+  FOUNDER
+}
+
+enum TagCategory {
+  STACK
+  TOPIC
+}
+
+enum ApplicationStatus {
+  SUBMITTED
+  IN_REVIEW
+  ACCEPTED
+  REJECTED
+}
+
+// ============================================================================
+// E1 - Auth & Users
+// ============================================================================
+
+model User {
+  id              String    @id @default(uuid())
+  githubId        String    @unique
+  githubUsername  String    @unique
+  email           String?   @unique
+  avatarUrl       String?
+  acceptedTermsAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  profile                Profile?
+  mentorshipApplications MentorshipApplication[]
+  projects               UserProject[]
+}
+
+model Profile {
+  id          String       @id @default(uuid())
+  userId      String       @unique
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName String
+  bio         String?
+  linkedinUrl String?
+  type        ProfileType  @default(MEMBER)
+  location    String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  tags        ProfileTag[]
+
+  @@index([type])
+}
+
+// ============================================================================
+// E3/E4 - Tags (Stack e Topicos)
+// ============================================================================
+
+model Tag {
+  id        String           @id @default(uuid())
+  slug      String           @unique
+  label     String
+  category  TagCategory      @default(STACK)
+  createdAt DateTime         @default(now())
+
+  profiles    ProfileTag[]
+  projectTags UserProjectTag[]
+}
+
+model ProfileTag {
+  profileId String
+  tagId     String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([profileId, tagId])
+  @@index([tagId])
+}
+
+// ============================================================================
+// E5 - Eventos
+// ============================================================================
+
+model Event {
+  id          String     @id @default(uuid())
+  number      String     @unique
+  title       String
+  description String
+  dateFull    String
+  dateShort   String
+  type        EventType
+  visibility  Visibility @default(PUBLIC)
+  imageIndex  Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([visibility])
+  @@index([type])
+}
+
+// ============================================================================
+// E5 - Desafios
+// ============================================================================
+
+model Challenge {
+  id          String         @id @default(uuid())
+  number      String         @unique
+  title       String
+  description String
+  imageIndex  Int
+  visibility  Visibility     @default(PUBLIC)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  tags        ChallengeTag[]
+
+  @@index([visibility])
+}
+
+model ChallengeTag {
+  id          String    @id @default(uuid())
+  challengeId String
+  iconName    String
+  label       String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  @@index([challengeId])
+}
+
+// ============================================================================
+// E7 - Projetos (vitrine)
+// ============================================================================
+
+model UserProject {
+  id           String            @id @default(uuid())
+  userId       String
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title        String
+  description  String
+  authorAvatar String?
+  image        String?
+  category     ProjectCategoryDb
+  demoUrl      String?
+  repoUrl      String?
+  visibility   Visibility        @default(MEMBERS)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  tags         UserProjectTag[]
+
+  @@index([category])
+  @@index([visibility])
+  @@index([userId])
+}
+
+model UserProjectTag {
+  projectId String
+  tagId     String
+  project   UserProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tag       Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, tagId])
+  @@index([tagId])
+}
+
+// ============================================================================
+// E6 - Mentoria (candidatura)
+// ============================================================================
+
+model MentorshipApplication {
+  id           String            @id @default(uuid())
+  userId       String
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal         String
+  availability String
+  stack        String
+  status       ApplicationStatus @default(SUBMITTED)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
