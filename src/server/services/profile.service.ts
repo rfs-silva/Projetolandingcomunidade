@@ -7,7 +7,9 @@ import {
   type OnboardingInput,
   type ProfileDto,
 } from '@/server/schemas/profile.schema'
-import { NotFoundError } from '@/server/http/errors'
+import { AppError, NotFoundError } from '@/server/http/errors'
+
+const MAX_PROFILE_TAGS = 10
 
 export const profileService = {
   async getByUserId(userId: string) {
@@ -41,6 +43,44 @@ export const profileService = {
       select: { acceptedTermsAt: true, profile: { select: { id: true } } },
     })
     return !!user?.acceptedTermsAt && !!user.profile
+  },
+
+  async addTag(userId: string, tagId: string): Promise<ProfileDto> {
+    const profile = await prisma.profile.findUnique({
+      where: { userId },
+      select: { id: true, _count: { select: { tags: true } } },
+    })
+    if (!profile) throw new NotFoundError('Perfil')
+
+    if (profile._count.tags >= MAX_PROFILE_TAGS) {
+      throw new AppError(
+        'TAG_LIMIT_REACHED',
+        `Limite de ${MAX_PROFILE_TAGS} tags atingido`,
+        409,
+      )
+    }
+
+    const tag = await prisma.tag.findUnique({ where: { id: tagId } })
+    if (!tag) throw new NotFoundError('Tag')
+
+    await prisma.profileTag.upsert({
+      where: { profileId_tagId: { profileId: profile.id, tagId } },
+      create: { profileId: profile.id, tagId },
+      update: {},
+    })
+
+    return this.getDtoByUserId(userId)
+  },
+
+  async removeTag(userId: string, tagId: string): Promise<ProfileDto> {
+    const profile = await prisma.profile.findUnique({ where: { userId } })
+    if (!profile) throw new NotFoundError('Perfil')
+
+    await prisma.profileTag.deleteMany({
+      where: { profileId: profile.id, tagId },
+    })
+
+    return this.getDtoByUserId(userId)
   },
 
   async update(userId: string, raw: unknown): Promise<ProfileDto> {

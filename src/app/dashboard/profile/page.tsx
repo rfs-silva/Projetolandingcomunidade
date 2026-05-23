@@ -8,6 +8,7 @@ import { auth, signOut } from '@/auth'
 import { Button } from '@/components/ui/button'
 import { UserAvatar } from '@/components/ui/UserAvatar'
 import { profileService } from '@/server/services/profile.service'
+import { tagsService } from '@/server/services/tags.service'
 
 export const metadata = {
   title: 'Meu perfil · Comunidade Roraima',
@@ -16,6 +17,7 @@ export const metadata = {
 export const dynamic = 'force-dynamic'
 
 import { ProfileForm } from './ProfileForm'
+import { TagsManager } from './TagsManager'
 
 export default async function ProfilePage() {
   const session = await auth()
@@ -24,7 +26,10 @@ export default async function ProfilePage() {
   const onboarded = await profileService.hasCompletedOnboarding(session.user.id)
   if (!onboarded) redirect('/onboarding')
 
-  const profile = await profileService.getDtoByUserId(session.user.id)
+  const [profile, allTags] = await Promise.all([
+    profileService.getDtoByUserId(session.user.id),
+    tagsService.list({}),
+  ])
   const user = session.user
 
   async function updateAction(formData: FormData): Promise<{ error?: string } | void> {
@@ -121,6 +126,17 @@ export default async function ProfilePage() {
         </div>
 
         <ProfileForm profile={profile} action={updateAction} />
+
+        <div className="mt-12 pt-8 border-t border-subtle">
+          <h2 className="text-xl font-semibold text-foreground">
+            Minhas tags
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1 mb-5">
+            Adicione sua stack e interesses. Outros membros poderão te
+            encontrar pelo mural usando essas tags.
+          </p>
+          <TagsManager initialSelected={profile.tags} allTags={allTags} />
+        </div>
       </section>
     </main>
   )
