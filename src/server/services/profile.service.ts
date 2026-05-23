@@ -1,11 +1,38 @@
 import 'server-only'
 import { prisma } from '@/server/lib/prisma'
-import { onboardingSchema, type OnboardingInput } from '@/server/schemas/profile.schema'
+import {
+  onboardingSchema,
+  profileSchema,
+  profileUpdateSchema,
+  type OnboardingInput,
+  type ProfileDto,
+} from '@/server/schemas/profile.schema'
 import { NotFoundError } from '@/server/http/errors'
 
 export const profileService = {
   async getByUserId(userId: string) {
     return prisma.profile.findUnique({ where: { userId } })
+  },
+
+  async getDtoByUserId(userId: string): Promise<ProfileDto> {
+    const row = await prisma.profile.findUnique({
+      where: { userId },
+      include: { tags: { include: { tag: true } } },
+    })
+    if (!row) throw new NotFoundError('Perfil')
+    return profileSchema.parse({
+      id: row.id,
+      displayName: row.displayName,
+      bio: row.bio,
+      linkedinUrl: row.linkedinUrl,
+      type: row.type,
+      location: row.location,
+      tags: row.tags.map((pt) => ({
+        id: pt.tag.id,
+        slug: pt.tag.slug,
+        label: pt.tag.label,
+      })),
+    })
   },
 
   async hasCompletedOnboarding(userId: string): Promise<boolean> {
@@ -14,6 +41,25 @@ export const profileService = {
       select: { acceptedTermsAt: true, profile: { select: { id: true } } },
     })
     return !!user?.acceptedTermsAt && !!user.profile
+  },
+
+  async update(userId: string, raw: unknown): Promise<ProfileDto> {
+    const data = profileUpdateSchema.parse(raw)
+    const existing = await prisma.profile.findUnique({ where: { userId } })
+    if (!existing) throw new NotFoundError('Perfil')
+
+    await prisma.profile.update({
+      where: { userId },
+      data: {
+        displayName: data.displayName,
+        bio: data.bio,
+        linkedinUrl: data.linkedinUrl,
+        location: data.location,
+        type: data.type,
+      },
+    })
+
+    return this.getDtoByUserId(userId)
   },
 
   async completeOnboarding(userId: string, raw: unknown) {
