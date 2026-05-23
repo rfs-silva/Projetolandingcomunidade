@@ -2,6 +2,7 @@ import {
   PrismaClient,
   EventType,
   ProjectCategoryDb,
+  TagCategory,
   Visibility,
 } from '@prisma/client'
 
@@ -88,18 +89,72 @@ const CHALLENGES = [
   },
 ]
 
-const TAGS = [
-  { slug: 'react', label: 'React' },
-  { slug: 'typescript', label: 'TypeScript' },
-  { slug: 'tailwind', label: 'Tailwind' },
-  { slug: 'recharts', label: 'Recharts' },
-  { slug: 'node', label: 'Node.js' },
-  { slug: 'docker', label: 'Docker' },
-  { slug: 'kubernetes', label: 'Kubernetes' },
-  { slug: 'postgres', label: 'PostgreSQL' },
-  { slug: 'flutter', label: 'Flutter' },
-  { slug: 'dart', label: 'Dart' },
-  { slug: 'firebase', label: 'Firebase' },
+const TAGS: { slug: string; label: string; category: TagCategory }[] = [
+  // Frontend
+  { slug: 'react', label: 'React', category: TagCategory.STACK },
+  { slug: 'next-js', label: 'Next.js', category: TagCategory.STACK },
+  { slug: 'vue', label: 'Vue', category: TagCategory.STACK },
+  { slug: 'angular', label: 'Angular', category: TagCategory.STACK },
+  { slug: 'svelte', label: 'Svelte', category: TagCategory.STACK },
+  { slug: 'astro', label: 'Astro', category: TagCategory.STACK },
+  { slug: 'typescript', label: 'TypeScript', category: TagCategory.STACK },
+  { slug: 'javascript', label: 'JavaScript', category: TagCategory.STACK },
+  { slug: 'tailwind', label: 'Tailwind', category: TagCategory.STACK },
+  { slug: 'css', label: 'CSS', category: TagCategory.STACK },
+  { slug: 'html', label: 'HTML', category: TagCategory.STACK },
+  { slug: 'recharts', label: 'Recharts', category: TagCategory.STACK },
+
+  // Backend
+  { slug: 'node', label: 'Node.js', category: TagCategory.STACK },
+  { slug: 'python', label: 'Python', category: TagCategory.STACK },
+  { slug: 'django', label: 'Django', category: TagCategory.STACK },
+  { slug: 'fastapi', label: 'FastAPI', category: TagCategory.STACK },
+  { slug: 'go', label: 'Go', category: TagCategory.STACK },
+  { slug: 'rust', label: 'Rust', category: TagCategory.STACK },
+  { slug: 'java', label: 'Java', category: TagCategory.STACK },
+  { slug: 'spring', label: 'Spring Boot', category: TagCategory.STACK },
+  { slug: 'kotlin', label: 'Kotlin', category: TagCategory.STACK },
+  { slug: 'ruby', label: 'Ruby', category: TagCategory.STACK },
+  { slug: 'rails', label: 'Rails', category: TagCategory.STACK },
+  { slug: 'php', label: 'PHP', category: TagCategory.STACK },
+  { slug: 'laravel', label: 'Laravel', category: TagCategory.STACK },
+  { slug: 'csharp', label: 'C#', category: TagCategory.STACK },
+  { slug: 'dotnet', label: '.NET', category: TagCategory.STACK },
+
+  // Mobile
+  { slug: 'react-native', label: 'React Native', category: TagCategory.STACK },
+  { slug: 'flutter', label: 'Flutter', category: TagCategory.STACK },
+  { slug: 'dart', label: 'Dart', category: TagCategory.STACK },
+  { slug: 'swift', label: 'Swift', category: TagCategory.STACK },
+
+  // Databases & dados
+  { slug: 'postgres', label: 'PostgreSQL', category: TagCategory.STACK },
+  { slug: 'mysql', label: 'MySQL', category: TagCategory.STACK },
+  { slug: 'mongodb', label: 'MongoDB', category: TagCategory.STACK },
+  { slug: 'redis', label: 'Redis', category: TagCategory.STACK },
+  { slug: 'prisma', label: 'Prisma', category: TagCategory.STACK },
+
+  // DevOps & cloud
+  { slug: 'docker', label: 'Docker', category: TagCategory.STACK },
+  { slug: 'kubernetes', label: 'Kubernetes', category: TagCategory.STACK },
+  { slug: 'aws', label: 'AWS', category: TagCategory.STACK },
+  { slug: 'gcp', label: 'GCP', category: TagCategory.STACK },
+  { slug: 'azure', label: 'Azure', category: TagCategory.STACK },
+  { slug: 'firebase', label: 'Firebase', category: TagCategory.STACK },
+  { slug: 'linux', label: 'Linux', category: TagCategory.STACK },
+  { slug: 'git', label: 'Git', category: TagCategory.STACK },
+
+  // APIs
+  { slug: 'graphql', label: 'GraphQL', category: TagCategory.STACK },
+  { slug: 'rest', label: 'REST', category: TagCategory.STACK },
+
+  // Tópicos de interesse (não-stack)
+  { slug: 'open-source', label: 'Open Source', category: TagCategory.TOPIC },
+  { slug: 'carreira', label: 'Carreira', category: TagCategory.TOPIC },
+  { slug: 'mentoria', label: 'Mentoria', category: TagCategory.TOPIC },
+  { slug: 'lideranca', label: 'Liderança', category: TagCategory.TOPIC },
+  { slug: 'iniciante', label: 'Iniciante', category: TagCategory.TOPIC },
+  { slug: 'comunidade', label: 'Comunidade', category: TagCategory.TOPIC },
 ]
 
 const SEED_USERS = [
@@ -174,7 +229,7 @@ async function main() {
   for (const t of TAGS) {
     await prisma.tag.upsert({
       where: { slug: t.slug },
-      update: { label: t.label },
+      update: { label: t.label, category: t.category },
       create: t,
     })
   }
