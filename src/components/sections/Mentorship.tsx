@@ -1,5 +1,4 @@
-'use client'
-
+import { AuthGate } from '@/components/auth/AuthGate'
 import { Button } from '@/components/ui/button'
 import { Braces, Code2, Lightbulb, Smartphone } from 'lucide-react'
 import React from 'react'
@@ -63,21 +62,29 @@ const Mentorship: React.FC = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-          <Button
-            type="button"
-            onClick={() => {}}
-            className="w-full h-10 sm:w-auto min-w-50"
+          <AuthGate
+            authedHref="/dashboard"
+            title="Candidate-se à mentoria"
+            description="O programa de mentoria é exclusivo para membros. Entre com sua conta GitHub para se candidatar."
           >
-            Quero ser mentorado
-          </Button>
-          <Button
-            type="button"
-            onClick={() => {}}
-            variant="outline-primary"
-            className="w-full h-10 sm:w-auto min-w-50"
+            <Button type="button" className="w-full h-10 sm:w-auto min-w-50">
+              Quero ser mentorado
+            </Button>
+          </AuthGate>
+
+          <AuthGate
+            authedHref="/dashboard"
+            title="Inscreva-se como mentor"
+            description="Só membros podem se inscrever como mentores. Entre com sua conta GitHub para começar."
           >
-            Quero ser mentor
-          </Button>
+            <Button
+              type="button"
+              variant="outline-primary"
+              className="w-full h-10 sm:w-auto min-w-50"
+            >
+              Quero ser mentor
+            </Button>
+          </AuthGate>
         </div>
       </div>
     </section>
