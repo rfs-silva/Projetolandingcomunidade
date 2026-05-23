@@ -1,12 +1,10 @@
-'use client'
-
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Calendar, Monitor, Users } from 'lucide-react'
 import Image from 'next/image'
 import React from 'react'
-import { EVENTS, type Event } from '../../data'
+import type { EventDto } from '@/server/schemas/event.schema'
 
-const EventCard: React.FC<Event> = ({
+const EventCard: React.FC<EventDto> = ({
   number,
   title,
   description,
@@ -74,7 +72,6 @@ const EventCard: React.FC<Event> = ({
 
       <Button
         type="button"
-        onClick={() => {}}
         className="w-full h-10 bg-[#182845] text-primary-destaque hover:text-foreground border border-blue-900/30 hover:border-transparent py-2.5 rounded-lg text-sm font-medium transition-all duration-300"
       >
         Inscreva-se agora
@@ -83,7 +80,11 @@ const EventCard: React.FC<Event> = ({
   </div>
 )
 
-const Events: React.FC = () => {
+type EventsProps = {
+  events: EventDto[]
+}
+
+const Events: React.FC<EventsProps> = ({ events }) => {
   return (
     <section id="events" className="py-20 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -92,22 +93,29 @@ const Events: React.FC = () => {
             Eventos
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-5xl leading-relaxed">
-            Roraima Fullstack Developers é um lugar para desenvolvedores
+            A Comunidade Roraima Devs é um lugar para desenvolvedores
             aprenderem, compartilharem e crescerem. Nossa comunidade é
             construída por desenvolvedores, para desenvolvedores.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-          {EVENTS.map((event, idx) => (
-            <EventCard key={idx} {...event} />
-          ))}
-        </div>
+        {events.length === 0 ? (
+          <div className="text-center py-16 bg-card rounded-xl border border-border border-dashed mb-12">
+            <p className="text-muted-foreground">
+              Nenhum evento disponível no momento.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+            {events.map((event) => (
+              <EventCard key={event.number} {...event} />
+            ))}
+          </div>
+        )}
 
         <div className="flex justify-center w-full">
           <Button
             type="button"
-            onClick={() => {}}
             className="bg-primary hover:bg-primary-hover text-foreground px-8 h-12 w-full sm:w-auto"
           >
             Ver todos os eventos <ArrowRight className="ml-2 w-4 h-4" />

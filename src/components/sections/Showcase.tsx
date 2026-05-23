@@ -1,21 +1,32 @@
 'use client'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { AuthGate } from '@/components/auth/AuthGate'
+import { Avatar, AvatarImage } from '@/components/ui/avatar'
+import { UserAvatar } from '@/components/ui/UserAvatar'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { ExternalLink, Github, Globe, Plus, Search } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState } from 'react'
-import { PROJECTS, PROJECT_CATEGORIES, type ProjectCategory } from '../../data'
+import type {
+  ProjectCategoryDto,
+  ProjectDto,
+} from '@/server/schemas/project.schema'
 
-const Showcase: React.FC = () => {
-  const [activeCategory, setActiveCategory] = useState<ProjectCategory>('Todos')
+type ShowcaseProps = {
+  projects: ProjectDto[]
+  categories: ProjectCategoryDto[]
+}
+
+const Showcase: React.FC<ShowcaseProps> = ({ projects, categories }) => {
+  const [activeCategory, setActiveCategory] =
+    useState<ProjectCategoryDto>('Todos')
 
   const filteredProjects =
     activeCategory === 'Todos'
-      ? PROJECTS
-      : PROJECTS.filter((project) => project.category === activeCategory)
+      ? projects
+      : projects.filter((project) => project.category === activeCategory)
 
   return (
     <section id="showcase" className="py-20 bg-background">
@@ -32,21 +43,27 @@ const Showcase: React.FC = () => {
             </p>
           </div>
           <div className="shrink-0 w-full md:w-auto">
-            <Button
-              type="button"
-              icon={<Plus size={18} className="mr-2" />}
-              iconPosition="left"
-              size="lg"
-              className="w-full md:w-auto shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] transition-shadow duration-300"
+            <AuthGate
+              authedHref="/dashboard"
+              title="Divulgue seu projeto"
+              description="O mural de projetos é para membros da comunidade. Entre com sua conta GitHub para publicar."
             >
-              Divulgar projeto
-            </Button>
+              <Button
+                type="button"
+                icon={<Plus size={18} className="mr-2" />}
+                iconPosition="left"
+                size="lg"
+                className="w-full md:w-auto shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] transition-shadow duration-300"
+              >
+                Divulgar projeto
+              </Button>
+            </AuthGate>
           </div>
         </div>
 
         <div className="mb-10 border-b border-border pb-4 overflow-x-auto hide-scrollbar">
           <div className="flex flex-nowrap md:flex-wrap gap-2 min-w-max md:min-w-0 pb-2 md:pb-0">
-            {PROJECT_CATEGORIES.map((category) => (
+            {categories.map((category) => (
               <Button
                 type="button"
                 key={category}
@@ -72,14 +89,16 @@ const Showcase: React.FC = () => {
             >
               <div className="relative h-48 overflow-hidden bg-background-secondary">
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors z-10" />
-                <Image
-                  src={project.image}
-                  alt={project.title}
-                  width={100}
-                  height={100}
-                  priority
-                  className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                />
+                {project.image ? (
+                  <Image
+                    src={project.image}
+                    alt={project.title}
+                    width={100}
+                    height={100}
+                    priority
+                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : null}
                 <div className="absolute top-3 right-3 z-20">
                   <span className="px-2 py-1 bg-black/60 backdrop-blur-md text-[10px] font-bold text-foreground uppercase rounded border border-white/10 tracking-wider">
                     {project.category}
@@ -89,13 +108,16 @@ const Showcase: React.FC = () => {
 
               <div className="p-5 flex flex-col grow">
                 <div className="flex items-center gap-3 mb-4">
-                  <Avatar>
-                    <AvatarImage
-                      src={project.authorAvatar}
-                      alt={project.author}
-                    />
-                    <AvatarFallback>{project.author}</AvatarFallback>
-                  </Avatar>
+                  {project.authorAvatar ? (
+                    <Avatar>
+                      <AvatarImage
+                        src={project.authorAvatar}
+                        alt={project.author}
+                      />
+                    </Avatar>
+                  ) : (
+                    <UserAvatar name={project.author} seed={project.author} />
+                  )}
                   <span className="text-sm text-muted-foreground font-medium">
                     por <span className="text-zinc-200">{project.author}</span>
                   </span>
@@ -156,7 +178,6 @@ const Showcase: React.FC = () => {
             variant="outline-primary"
             size="lg"
             className="px-8 w-full h-10 sm:w-auto"
-            onClick={() => {}}
             icon={<ExternalLink size={16} className="ml-2" />}
             iconPosition="right"
           >

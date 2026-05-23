@@ -1,0 +1,28 @@
+{
+  "leaders": [
+    {
+      "name": "Raimundo Silva",
+      "role": "Fundador",
+      "bio": "Desenvolvedor fullstack apaixonado por construir comunidades.",
+      "githubUsername": "raimundosilvabv",
+      "linkedinUrl": null,
+      "avatarUrl": null
+    },
+    {
+      "name": "Liderança 2",
+      "role": "Liderança técnica",
+      "bio": "Responsável por mentoria e arquitetura.",
+      "githubUsername": null,
+      "linkedinUrl": null,
+      "avatarUrl": null
+    },
+    {
+      "name": "Liderança 3",
+      "role": "Liderança de comunidade",
+      "bio": "Cuida da agenda de eventos e parcerias.",
+      "githubUsername": null,
+      "linkedinUrl": null,
+      "avatarUrl": null
+    }
+  ]
+}

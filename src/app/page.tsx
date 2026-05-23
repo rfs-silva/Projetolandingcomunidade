@@ -1,31 +1,49 @@
+import type { Metadata } from 'next'
 import Footer from '@/components/layout/Footer'
 import Header from '@/components/layout/Header'
 import About from '@/components/sections/About'
 import Challenges from '@/components/sections/Challenges'
 import Events from '@/components/sections/Events'
 import Hero from '@/components/sections/Hero'
+import Leaders from '@/components/sections/Leaders'
 import Mentorship from '@/components/sections/Mentorship'
 import Showcase from '@/components/sections/Showcase'
-import type { Metadata } from 'next'
+import { eventsService } from '@/server/services/events.service'
+import { challengesService } from '@/server/services/challenges.service'
+import { projectsService } from '@/server/services/projects.service'
+import { leadersService } from '@/server/services/leaders.service'
 
 export const metadata: Metadata = {
-  title: 'RR Fullstack Developers - Comunidade de Desenvolvedores em Roraima',
+  title: 'Comunidade Roraima Devs',
   description:
-    'Comunidade de desenvolvedores fullstack em Roraima. Networking, eventos, desafios e mentoria para crescer na carreira tech.',
+    'Comunidade de desenvolvedores em Roraima. Networking, eventos, desafios e mentoria para crescer na carreira tech.',
   keywords:
-    'desenvolvimento fullstack, comunidade de desenvolvedores, Roraima, networking, eventos tech, desafios de programação, mentoria para desenvolvedores',
+    'comunidade de desenvolvedores, Roraima, networking, eventos tech, desafios de programação, mentoria, dev',
 }
 
-export default function Home() {
+// Render dinâmico por requisição. Os datasets são pequenos
+// e o Prisma reaproveita a conexão via singleton.
+export const dynamic = 'force-dynamic'
+
+export default async function Home() {
+  const [events, challenges, projects, leaders] = await Promise.all([
+    eventsService.list({}),
+    challengesService.list(),
+    projectsService.list({}),
+    leadersService.list(),
+  ])
+  const categories = projectsService.listCategories()
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary selection:text-foreground overflow-x-hidden">
       <Header />
       <main className="grow">
         <Hero />
         <About />
-        <Events />
-        <Challenges />
-        <Showcase />
+        <Leaders leaders={leaders} />
+        <Events events={events} />
+        <Challenges challenges={challenges} />
+        <Showcase projects={projects} categories={categories} />
         <Mentorship />
       </main>
       <Footer />

@@ -1,20 +1,25 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { UserAvatar } from '@/components/ui/UserAvatar'
 import { cn } from '@/lib/utils'
-import { ArrowRight, ChevronRight, Menu, X } from 'lucide-react'
+import { ChevronRight, LogIn, Menu, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import React, { useEffect, useState } from 'react'
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('home')
+  const { data: session, status } = useSession()
+  const isAuthenticated = status === 'authenticated' && !!session?.user
 
   const navLinks = [
     { name: 'Início', href: '#home', id: 'home' },
     { name: 'Comunidade', href: '#community', id: 'community' },
+    { name: 'Lideranças', href: '#leaders', id: 'leaders' },
     { name: 'Eventos', href: '#events', id: 'events' },
     { name: 'Desafios', href: '#challenges', id: 'challenges' },
     { name: 'Showcase', href: '#showcase', id: 'showcase' },
@@ -96,7 +101,7 @@ const Header: React.FC = () => {
           >
             <Image
               src="/logo-horizontal.svg"
-              alt="RR Fullstack Developers"
+              alt="Comunidade Roraima Devs"
               height={40}
               width={40}
               priority
@@ -123,20 +128,34 @@ const Header: React.FC = () => {
           </nav>
 
           <div className="hidden md:block">
-            <Button
-              type="button"
-              loading={false}
-              icon={<ArrowRight size={18} />}
-              iconPosition="right"
-              variant="default"
-              onClick={() => {
-                const el = document.getElementById('community')
-                el?.scrollIntoView({ behavior: 'smooth' })
-              }}
-              className="text-sm px-5 py-2.5 h-12"
-            >
-              Entrar na comunidade
-            </Button>
+            {isAuthenticated ? (
+              <Link
+                href="/dashboard"
+                aria-label="Ir para meu painel"
+                className="flex items-center gap-3 rounded-full pr-3 pl-1 py-1 hover:bg-card/60 transition-colors"
+              >
+                <UserAvatar
+                  src={session?.user?.image}
+                  name={session?.user?.name ?? session?.user?.githubUsername}
+                  seed={session?.user?.githubUsername ?? session?.user?.id}
+                />
+                <span className="text-sm font-medium text-foreground">
+                  {session?.user?.name ?? session?.user?.githubUsername}
+                </span>
+              </Link>
+            ) : (
+              <Link href="/login">
+                <Button
+                  type="button"
+                  icon={<LogIn size={18} />}
+                  iconPosition="right"
+                  variant="default"
+                  className="text-sm px-5 py-2.5 h-12"
+                >
+                  Entrar
+                </Button>
+              </Link>
+            )}
           </div>
 
           <Button
@@ -185,23 +204,44 @@ const Header: React.FC = () => {
           </nav>
 
           <div className="mt-auto pt-8 flex flex-col gap-4 animate-fade-in-up">
-            <Button
-              className="w-full justify-center h-14 text-lg shadow-[0_0_20px_rgba(37,99,235,0.2)]"
-              icon={<ChevronRight />}
-              iconPosition="right"
-              onClick={() => {
-                setIsMobileMenuOpen(false)
-                setTimeout(() => {
-                  const el = document.getElementById('community')
-                  el?.scrollIntoView({ behavior: 'smooth' })
-                }, 300)
-              }}
-            >
-              Entrar na comunidade
-            </Button>
+            {isAuthenticated ? (
+              <Link
+                href="/dashboard"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-4 rounded-2xl border border-subtle bg-card px-4 py-3"
+              >
+                <UserAvatar
+                  size="lg"
+                  src={session?.user?.image}
+                  name={session?.user?.name ?? session?.user?.githubUsername}
+                  seed={session?.user?.githubUsername ?? session?.user?.id}
+                />
+                <div className="flex flex-col">
+                  <span className="text-base font-medium text-foreground">
+                    {session?.user?.name ?? session?.user?.githubUsername}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    Ir para o meu painel →
+                  </span>
+                </div>
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Button
+                  className="w-full justify-center h-14 text-lg shadow-[0_0_20px_rgba(37,99,235,0.2)]"
+                  icon={<LogIn />}
+                  iconPosition="right"
+                >
+                  Entrar
+                </Button>
+              </Link>
+            )}
 
             <p className="text-center text-muted-secondary text-xs mt-4">
-              © {new Date().getFullYear()} RR Fullstack Developers
+              © {new Date().getFullYear()} Comunidade Roraima Devs
             </p>
           </div>
         </div>

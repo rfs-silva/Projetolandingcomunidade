@@ -46,7 +46,7 @@ const Footer: React.FC = () => {
           >
             <Image
               src="/logo.svg"
-              alt="RR Fullstack Developers"
+              alt="Comunidade Roraima Devs"
               width={48}
               height={48}
               priority
@@ -54,10 +54,10 @@ const Footer: React.FC = () => {
             />
             <div className="flex flex-col items-center mt-2">
               <span className="font-bold text-[10px] tracking-widest text-muted-secondary group-hover:text-zinc-300 transition-colors">
-                FULLSTACK DEVELOPERS
+                COMUNIDADE
               </span>
               <span className="font-bold text-[10px] tracking-widest text-primary group-hover:text-primary-destaque transition-colors">
-                RORAIMA
+                RORAIMA DEVS
               </span>
             </div>
           </Link>
@@ -82,12 +82,35 @@ const Footer: React.FC = () => {
 
         <div className="flex flex-col md:flex-row items-center gap-4 text-center">
           <p className="text-muted text-xs md:text-sm">
-            © {new Date().getFullYear()} RR Fullstack Developers.
+            © {new Date().getFullYear()} Comunidade Roraima Devs.
           </p>
           <span className="hidden md:block text-zinc-800">•</span>
           <p className="text-muted text-xs md:text-sm">
             Desenvolvido com ❤️ em Roraima.
           </p>
+        </div>
+
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs md:text-sm">
+          <Link
+            href="/manifesto"
+            className="text-muted-secondary hover:text-foreground transition-colors"
+          >
+            Manifesto
+          </Link>
+          <span className="text-zinc-800">•</span>
+          <Link
+            href="/termos"
+            className="text-muted-secondary hover:text-foreground transition-colors"
+          >
+            Termos de Uso
+          </Link>
+          <span className="text-zinc-800">•</span>
+          <Link
+            href="/privacidade"
+            className="text-muted-secondary hover:text-foreground transition-colors"
+          >
+            Política de Privacidade
+          </Link>
         </div>
       </div>
     </footer>
