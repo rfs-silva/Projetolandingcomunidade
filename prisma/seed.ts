@@ -1,6 +1,7 @@
 import {
   PrismaClient,
   EventType,
+  ProfileType,
   ProjectCategoryDb,
   TagCategory,
   Visibility,
@@ -157,12 +158,42 @@ const TAGS: { slug: string; label: string; category: TagCategory }[] = [
   { slug: 'comunidade', label: 'Comunidade', category: TagCategory.TOPIC },
 ]
 
-const SEED_USERS = [
+type SeedProject = {
+  title: string
+  description: string
+  image: string
+  category: ProjectCategoryDb
+  tagSlugs: string[]
+}
+
+type SeedUser = {
+  githubId: string
+  githubUsername: string
+  displayName: string
+  avatarUrl: string
+  profile: {
+    type: ProfileType
+    bio: string
+    linkedinUrl: string | null
+    location: string
+    tagSlugs: string[]
+  }
+  project?: SeedProject
+}
+
+const SEED_USERS: SeedUser[] = [
   {
     githubId: 'seed-ana-silva',
     githubUsername: 'ana-silva',
     displayName: 'Ana Silva',
     avatarUrl: 'https://i.pravatar.cc/150?u=a042581f4e29026024d',
+    profile: {
+      type: ProfileType.MEMBER,
+      bio: 'Frontend developer focada em produtos analíticos e visualização de dados.',
+      linkedinUrl: 'https://www.linkedin.com/in/ana-silva-demo',
+      location: 'Boa Vista, RR',
+      tagSlugs: ['react', 'typescript', 'tailwind', 'recharts', 'carreira'],
+    },
     project: {
       title: 'E-commerce Dashboard',
       description:
@@ -177,6 +208,13 @@ const SEED_USERS = [
     githubUsername: 'carlos-souza',
     displayName: 'Carlos Souza',
     avatarUrl: 'https://i.pravatar.cc/150?u=a042581f4e29026704d',
+    profile: {
+      type: ProfileType.MEMBER,
+      bio: 'Backend engineer especializado em microsserviços e infra cloud.',
+      linkedinUrl: 'https://www.linkedin.com/in/carlos-souza-demo',
+      location: 'Boa Vista, RR',
+      tagSlugs: ['node', 'docker', 'kubernetes', 'postgres', 'aws'],
+    },
     project: {
       title: 'Delivery API Microservices',
       description:
@@ -191,6 +229,13 @@ const SEED_USERS = [
     githubUsername: 'beatriz-oliveira',
     displayName: 'Beatriz Oliveira',
     avatarUrl: 'https://i.pravatar.cc/150?u=a04258114e29026302d',
+    profile: {
+      type: ProfileType.MEMBER,
+      bio: 'Mobile developer apaixonada por aplicativos financeiros.',
+      linkedinUrl: null,
+      location: 'Boa Vista, RR',
+      tagSlugs: ['flutter', 'dart', 'firebase'],
+    },
     project: {
       title: 'Finanças Pessoais App',
       description:
@@ -198,6 +243,71 @@ const SEED_USERS = [
       image: 'https://picsum.photos/seed/finance/600/350',
       category: ProjectCategoryDb.MOBILE,
       tagSlugs: ['flutter', 'dart', 'firebase'],
+    },
+  },
+  {
+    githubId: 'seed-pedro-mendes',
+    githubUsername: 'pedro-mendes',
+    displayName: 'Pedro Mendes',
+    avatarUrl: 'https://i.pravatar.cc/150?u=pedro-mendes',
+    profile: {
+      type: ProfileType.LEADER,
+      bio: 'Fullstack dev e liderança técnica. Cuida da agenda de eventos.',
+      linkedinUrl: 'https://www.linkedin.com/in/pedro-mendes-demo',
+      location: 'Boa Vista, RR',
+      tagSlugs: ['react', 'next-js', 'node', 'typescript', 'lideranca', 'mentoria'],
+    },
+  },
+  {
+    githubId: 'seed-mariana-costa',
+    githubUsername: 'mariana-costa',
+    displayName: 'Mariana Costa',
+    avatarUrl: 'https://i.pravatar.cc/150?u=mariana-costa',
+    profile: {
+      type: ProfileType.MEMBER,
+      bio: 'Pythonista, gosta de APIs limpas e bem documentadas.',
+      linkedinUrl: 'https://www.linkedin.com/in/mariana-costa-demo',
+      location: 'Boa Vista, RR',
+      tagSlugs: ['python', 'fastapi', 'django', 'postgres', 'docker'],
+    },
+  },
+  {
+    githubId: 'seed-lucas-andrade',
+    githubUsername: 'lucas-andrade',
+    displayName: 'Lucas Andrade',
+    avatarUrl: 'https://i.pravatar.cc/150?u=lucas-andrade',
+    profile: {
+      type: ProfileType.MEMBER,
+      bio: 'Aprendendo desenvolvimento web e curtindo o caminho.',
+      linkedinUrl: null,
+      location: 'Pacaraima, RR',
+      tagSlugs: ['javascript', 'css', 'html', 'vue', 'iniciante'],
+    },
+  },
+  {
+    githubId: 'seed-techrr',
+    githubUsername: 'techrr',
+    displayName: 'TechRR Soluções',
+    avatarUrl: 'https://i.pravatar.cc/150?u=techrr',
+    profile: {
+      type: ProfileType.COMPANY,
+      bio: 'Empresa parceira da comunidade. Oferece estágio e mentoria.',
+      linkedinUrl: 'https://www.linkedin.com/company/techrr-demo',
+      location: 'Boa Vista, RR',
+      tagSlugs: ['comunidade', 'mentoria', 'carreira'],
+    },
+  },
+  {
+    githubId: 'seed-renato-alves',
+    githubUsername: 'renato-alves',
+    displayName: 'Renato Alves',
+    avatarUrl: 'https://i.pravatar.cc/150?u=renato-alves',
+    profile: {
+      type: ProfileType.MEMBER,
+      bio: 'Mobile developer cross-plataforma. Curte open source.',
+      linkedinUrl: null,
+      location: 'Boa Vista, RR',
+      tagSlugs: ['react-native', 'swift', 'kotlin', 'open-source'],
     },
   },
 ]
@@ -241,22 +351,41 @@ async function main() {
       update: {
         githubUsername: seed.githubUsername,
         avatarUrl: seed.avatarUrl,
+        acceptedTermsAt: new Date(),
       },
       create: {
         githubId: seed.githubId,
         githubUsername: seed.githubUsername,
         avatarUrl: seed.avatarUrl,
+        acceptedTermsAt: new Date(),
       },
     })
 
-    await prisma.profile.upsert({
+    const profileData = {
+      displayName: seed.displayName,
+      type: seed.profile.type,
+      bio: seed.profile.bio,
+      linkedinUrl: seed.profile.linkedinUrl,
+      location: seed.profile.location,
+    }
+
+    const profile = await prisma.profile.upsert({
       where: { userId: user.id },
-      update: { displayName: seed.displayName },
-      create: {
-        userId: user.id,
-        displayName: seed.displayName,
-      },
+      update: profileData,
+      create: { userId: user.id, ...profileData },
     })
+
+    await prisma.profileTag.deleteMany({ where: { profileId: profile.id } })
+    for (const slug of seed.profile.tagSlugs) {
+      const tag = await prisma.tag.findUnique({ where: { slug } })
+      if (tag) {
+        await prisma.profileTag.create({
+          data: { profileId: profile.id, tagId: tag.id },
+        })
+      }
+    }
+
+    if (!seed.project) continue
 
     const existingProject = await prisma.userProject.findFirst({
       where: { userId: user.id, title: seed.project.title },

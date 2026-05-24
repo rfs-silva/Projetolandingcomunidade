@@ -3,6 +3,9 @@ import { NextResponse } from 'next/server'
 
 export type Meta = {
   total: number
+  page?: number
+  pageSize?: number
+  totalPages?: number
 }
 
 export function ok<T>(data: T, meta?: Meta, init?: ResponseInit) {
