@@ -35,6 +35,7 @@ type ProjectRow = {
   authorAvatar: string | null
   image: string | null
   category: ProjectCategoryDb
+  visibility: 'PUBLIC' | 'MEMBERS'
   demoUrl: string | null
   repoUrl: string | null
   user: { profile: { displayName: string } | null } | null
@@ -51,6 +52,7 @@ function toDto(row: ProjectRow): ProjectDto {
     description: row.description,
     tags: row.tags.map((t) => t.tag.label),
     category: DB_TO_DTO[row.category],
+    visibility: row.visibility,
     demoUrl: row.demoUrl ?? '#',
     repoUrl: row.repoUrl ?? '#',
   }
