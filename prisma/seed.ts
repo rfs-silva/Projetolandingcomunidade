@@ -19,6 +19,7 @@ const EVENTS = [
     dateShort: '01 de Fevereiro',
     type: EventType.REMOTO,
     imageIndex: 201,
+    visibility: Visibility.PUBLIC,
   },
   {
     number: '#02',
@@ -29,6 +30,7 @@ const EVENTS = [
     dateShort: '01 de Fevereiro',
     type: EventType.REMOTO,
     imageIndex: 202,
+    visibility: Visibility.PUBLIC,
   },
   {
     number: '#03',
@@ -39,6 +41,7 @@ const EVENTS = [
     dateShort: '01 de Fevereiro',
     type: EventType.REMOTO,
     imageIndex: 203,
+    visibility: Visibility.PUBLIC,
   },
   {
     number: '#04',
@@ -49,6 +52,29 @@ const EVENTS = [
     dateShort: '01 de Fevereiro',
     type: EventType.PRESENCIAL,
     imageIndex: 204,
+    visibility: Visibility.PUBLIC,
+  },
+  {
+    number: '#05',
+    title: 'Code Review entre membros',
+    description:
+      'Encontro fechado para revisar projetos da comunidade com feedback técnico aprofundado.',
+    dateFull: 'Quarta-feira, 17h',
+    dateShort: 'Code review',
+    type: EventType.REMOTO,
+    imageIndex: 205,
+    visibility: Visibility.MEMBERS,
+  },
+  {
+    number: '#06',
+    title: 'Roda de carreira',
+    description:
+      'Conversa entre membros e lideranças sobre transições de carreira, salário e oportunidades.',
+    dateFull: 'Sexta-feira, 19h',
+    dateShort: 'Roda de carreira',
+    type: EventType.PRESENCIAL,
+    imageIndex: 206,
+    visibility: Visibility.MEMBERS,
   },
 ]
 
@@ -63,6 +89,7 @@ const CHALLENGES = [
       { iconName: 'Monitor', label: 'Avançado' },
       { iconName: 'Layers', label: 'Next.js' },
     ],
+    visibility: Visibility.PUBLIC,
   },
   {
     number: '#02',
@@ -71,6 +98,7 @@ const CHALLENGES = [
       'Aprimore a experiência de usuário de um projeto existente, considerando boas práticas.',
     imageIndex: 2,
     tags: [{ iconName: 'Monitor', label: 'Iniciante' }],
+    visibility: Visibility.PUBLIC,
   },
   {
     number: '#03',
@@ -79,6 +107,7 @@ const CHALLENGES = [
       'Construa uma suíte de testes automatizados para garantir a qualidade de software.',
     imageIndex: 3,
     tags: [{ iconName: 'Monitor', label: 'Iniciante' }],
+    visibility: Visibility.PUBLIC,
   },
   {
     number: '#04',
@@ -87,6 +116,19 @@ const CHALLENGES = [
       'Implemente e documente uma API RESTful para uso em aplicações modernas.',
     imageIndex: 4,
     tags: [{ iconName: 'Monitor', label: 'Intermediário' }],
+    visibility: Visibility.PUBLIC,
+  },
+  {
+    number: '#05',
+    title: 'Open Source da Comunidade',
+    description:
+      'Contribua para um repositório open source mantido pela comunidade. Mentoria de revisores incluída.',
+    imageIndex: 5,
+    tags: [
+      { iconName: 'Layers', label: 'Intermediário' },
+      { iconName: 'Monitor', label: 'Open Source' },
+    ],
+    visibility: Visibility.MEMBERS,
   },
 ]
 
@@ -318,7 +360,7 @@ async function main() {
     await prisma.event.upsert({
       where: { number: data.number },
       update: data,
-      create: { ...data, visibility: Visibility.PUBLIC },
+      create: data,
     })
   }
 
@@ -327,7 +369,7 @@ async function main() {
     const challenge = await prisma.challenge.upsert({
       where: { number: data.number },
       update: data,
-      create: { ...data, visibility: Visibility.PUBLIC },
+      create: data,
     })
     await prisma.challengeTag.deleteMany({ where: { challengeId: challenge.id } })
     await prisma.challengeTag.createMany({

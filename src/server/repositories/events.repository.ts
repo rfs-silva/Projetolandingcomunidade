@@ -25,16 +25,26 @@ function toDbType(type: EventType): DbEventType {
 }
 
 export const eventsRepository = {
-  async list({ type }: { type?: EventType } = {}): Promise<EventDto[]> {
+  async list({
+    type,
+    includeMembers = false,
+  }: { type?: EventType; includeMembers?: boolean } = {}): Promise<EventDto[]> {
     const rows = await prisma.event.findMany({
-      where: type ? { type: toDbType(type) } : undefined,
+      where: {
+        ...(type ? { type: toDbType(type) } : {}),
+        ...(includeMembers ? {} : { visibility: 'PUBLIC' }),
+      },
       orderBy: { number: 'asc' },
     })
     return rows.map(toDto)
   },
 
-  async findByNumber(num: string): Promise<EventDto | null> {
-    const row = await prisma.event.findUnique({ where: { number: normalize(num) } })
-    return row ? toDto(row) : null
+  async findByNumber(num: string, includeMembers = false): Promise<EventDto | null> {
+    const row = await prisma.event.findUnique({
+      where: { number: normalize(num) },
+    })
+    if (!row) return null
+    if (!includeMembers && row.visibility !== 'PUBLIC') return null
+    return toDto(row)
   },
 }

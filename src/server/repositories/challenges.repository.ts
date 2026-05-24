@@ -26,19 +26,24 @@ function toDto(row: ChallengeRow): ChallengeDto {
 }
 
 export const challengesRepository = {
-  async list(): Promise<ChallengeDto[]> {
+  async list({
+    includeMembers = false,
+  }: { includeMembers?: boolean } = {}): Promise<ChallengeDto[]> {
     const rows = await prisma.challenge.findMany({
+      where: includeMembers ? {} : { visibility: 'PUBLIC' },
       include: { tags: true },
       orderBy: { number: 'asc' },
     })
     return rows.map(toDto)
   },
 
-  async findByNumber(num: string): Promise<ChallengeDto | null> {
+  async findByNumber(num: string, includeMembers = false): Promise<ChallengeDto | null> {
     const row = await prisma.challenge.findUnique({
       where: { number: normalize(num) },
       include: { tags: true },
     })
-    return row ? toDto(row) : null
+    if (!row) return null
+    if (!includeMembers && row.visibility !== 'PUBLIC') return null
+    return toDto(row)
   },
 }

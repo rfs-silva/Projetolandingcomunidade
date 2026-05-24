@@ -4,13 +4,21 @@ import { challengeSchema, type ChallengeDto } from '@/server/schemas/challenge.s
 import { NotFoundError } from '@/server/http/errors'
 
 export const challengesService = {
-  async list(): Promise<ChallengeDto[]> {
-    const rows = await challengesRepository.list()
+  async list(
+    options: { includeMembers?: boolean } = {},
+  ): Promise<ChallengeDto[]> {
+    const rows = await challengesRepository.list(options)
     return rows.map((c) => challengeSchema.parse(c))
   },
 
-  async getByNumber(num: string): Promise<ChallengeDto> {
-    const challenge = await challengesRepository.findByNumber(num)
+  async getByNumber(
+    num: string,
+    options: { includeMembers?: boolean } = {},
+  ): Promise<ChallengeDto> {
+    const challenge = await challengesRepository.findByNumber(
+      num,
+      options.includeMembers,
+    )
     if (!challenge) throw new NotFoundError('Desafio')
     return challengeSchema.parse(challenge)
   },
