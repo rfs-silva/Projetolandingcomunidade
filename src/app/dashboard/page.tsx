@@ -150,10 +150,11 @@ export default async function DashboardPage() {
         </div>
 
         <h3 className="mt-12 mb-4 text-sm uppercase tracking-wider text-muted-foreground">
-          Em breve
+          Explore
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <ComingSoonCard
+          <ActiveCard
+            href="/dashboard/membros"
             icon={<Users size={20} />}
             title="Mural de membros"
             desc="Descubra devs por stack e tipo de perfil."
@@ -207,8 +208,43 @@ function ComingSoonCard({
       <div className="w-10 h-10 rounded-lg bg-background-secondary border border-subtle flex items-center justify-center text-muted-foreground mb-3">
         {icon}
       </div>
-      <h4 className="text-base font-medium text-foreground">{title}</h4>
+      <div className="flex items-center gap-2">
+        <h4 className="text-base font-medium text-foreground">{title}</h4>
+        <span className="text-[9px] uppercase tracking-wider text-muted-foreground bg-background-secondary border border-subtle px-1.5 py-0.5 rounded">
+          Em breve
+        </span>
+      </div>
       <p className="mt-1 text-sm text-muted-foreground">{desc}</p>
     </div>
+  )
+}
+
+function ActiveCard({
+  href,
+  icon,
+  title,
+  desc,
+}: {
+  href: string
+  icon: React.ReactNode
+  title: string
+  desc: string
+}) {
+  return (
+    <Link
+      href={href}
+      className="group rounded-2xl border border-subtle bg-card p-6 hover:border-primary/40 transition-colors"
+    >
+      <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center text-primary-destaque mb-3">
+        {icon}
+      </div>
+      <h4 className="text-base font-medium text-foreground group-hover:text-primary-destaque transition-colors">
+        {title}
+      </h4>
+      <p className="mt-1 text-sm text-muted-foreground">{desc}</p>
+      <span className="mt-3 inline-flex items-center gap-1 text-xs text-primary-destaque opacity-0 group-hover:opacity-100 transition-opacity">
+        Abrir <ArrowRight size={12} />
+      </span>
+    </Link>
   )
 }
