@@ -12,6 +12,7 @@ type ChallengeRow = {
   title: string
   description: string
   imageIndex: number
+  visibility: 'PUBLIC' | 'MEMBERS'
   tags: { iconName: string; label: string }[]
 }
 
@@ -21,6 +22,7 @@ function toDto(row: ChallengeRow): ChallengeDto {
     title: row.title,
     description: row.description,
     imageIndex: row.imageIndex,
+    visibility: row.visibility,
     tags: row.tags.map((t) => ({ iconName: t.iconName, label: t.label })),
   }
 }

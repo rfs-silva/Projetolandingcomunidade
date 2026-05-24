@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 export const eventTypeSchema = z.enum(['Remoto', 'Presencial'])
+export const visibilitySchema = z.enum(['PUBLIC', 'MEMBERS'])
 
 export const eventSchema = z.object({
   number: z.string(),
@@ -9,6 +10,7 @@ export const eventSchema = z.object({
   dateFull: z.string(),
   dateShort: z.string(),
   type: eventTypeSchema,
+  visibility: visibilitySchema,
   imageIndex: z.number().int(),
 })
 

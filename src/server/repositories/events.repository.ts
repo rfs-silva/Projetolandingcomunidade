@@ -16,6 +16,7 @@ function toDto(row: DbEvent): EventDto {
     dateFull: row.dateFull,
     dateShort: row.dateShort,
     type: row.type === DbEventType.REMOTO ? 'Remoto' : 'Presencial',
+    visibility: row.visibility,
     imageIndex: row.imageIndex,
   }
 }

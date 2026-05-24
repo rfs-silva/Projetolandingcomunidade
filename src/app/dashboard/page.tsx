@@ -3,12 +3,14 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import {
   ArrowRight,
+  Calendar,
+  FolderGit2,
+  Lightbulb,
   LogOut,
   Pencil,
   Sparkles,
+  Target,
   Users,
-  Lightbulb,
-  FolderGit2,
 } from 'lucide-react'
 import { auth, signOut } from '@/auth'
 import { Button } from '@/components/ui/button'
@@ -158,6 +160,18 @@ export default async function DashboardPage() {
             icon={<Users size={20} />}
             title="Mural de membros"
             desc="Descubra devs por stack e tipo de perfil."
+          />
+          <ActiveCard
+            href="/dashboard/eventos"
+            icon={<Calendar size={20} />}
+            title="Eventos"
+            desc="Eventos públicos e exclusivos para membros."
+          />
+          <ActiveCard
+            href="/dashboard/desafios"
+            icon={<Target size={20} />}
+            title="Desafios"
+            desc="Pratique com desafios da comunidade."
           />
           <ComingSoonCard
             icon={<Lightbulb size={20} />}
