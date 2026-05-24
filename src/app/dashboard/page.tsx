@@ -173,7 +173,8 @@ export default async function DashboardPage() {
             title="Desafios"
             desc="Pratique com desafios da comunidade."
           />
-          <ComingSoonCard
+          <ActiveCard
+            href="/dashboard/mentoria"
             icon={<Lightbulb size={20} />}
             title="Mentoria"
             desc="Candidate-se ao programa de mentoria."
