@@ -3,12 +3,53 @@
 import { useTransition, useState } from 'react'
 import { Loader2, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import type { MentorshipKind } from '@/server/schemas/mentorship.schema'
 
 type Action = (formData: FormData) => Promise<{ error?: string } | void>
 
-export function MentorshipForm({ action }: { action: Action }) {
+type Labels = {
+  goalLabel: string
+  goalPlaceholder: string
+  availabilityLabel: string
+  availabilityPlaceholder: string
+  stackLabel: string
+  stackPlaceholder: string
+  submitLabel: string
+}
+
+const LABELS_BY_KIND: Record<MentorshipKind, Labels> = {
+  MENTEE: {
+    goalLabel: 'O que você quer alcançar?',
+    goalPlaceholder:
+      'Ex: melhorar minha base em system design para entrevistas sênior em 6 meses.',
+    availabilityLabel: 'Sua disponibilidade',
+    availabilityPlaceholder: 'Ex: terça e quinta à noite, 1h por encontro',
+    stackLabel: 'Stack / área que quer aprender',
+    stackPlaceholder: 'Ex: Node.js, system design, backend',
+    submitLabel: 'Quero ser mentorado',
+  },
+  MENTOR: {
+    goalLabel: 'O que você pode oferecer?',
+    goalPlaceholder:
+      'Ex: 8 anos atuando como backend sênior, posso ajudar com arquitetura, carreira e entrevistas.',
+    availabilityLabel: 'Disponibilidade para mentorar',
+    availabilityPlaceholder: 'Ex: 1h por semana, terças à noite',
+    stackLabel: 'Stack / área que você domina',
+    stackPlaceholder: 'Ex: Go, Kubernetes, sistemas distribuídos',
+    submitLabel: 'Quero ser mentor',
+  },
+}
+
+export function MentorshipForm({
+  kind,
+  action,
+}: {
+  kind: MentorshipKind
+  action: Action
+}) {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const labels = LABELS_BY_KIND[kind]
 
   function onSubmit(formData: FormData) {
     setError(null)
@@ -22,6 +63,8 @@ export function MentorshipForm({ action }: { action: Action }) {
 
   return (
     <form action={onSubmit} className="flex flex-col gap-5">
+      <input type="hidden" name="kind" value={kind} />
+
       {error ? (
         <div className="rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {error}
@@ -29,25 +72,25 @@ export function MentorshipForm({ action }: { action: Action }) {
       ) : null}
 
       <Textarea
-        label="O que você quer alcançar?"
+        label={labels.goalLabel}
         name="goal"
         required
         rows={4}
-        placeholder="Ex: melhorar minha base em system design para passar em entrevistas sênior em 6 meses."
+        placeholder={labels.goalPlaceholder}
       />
 
       <Field
-        label="Disponibilidade"
+        label={labels.availabilityLabel}
         name="availability"
         required
-        placeholder="Ex: terça e quinta à noite, 1h por encontro"
+        placeholder={labels.availabilityPlaceholder}
       />
 
       <Field
-        label="Stack / área de interesse"
+        label={labels.stackLabel}
         name="stack"
         required
-        placeholder="Ex: Node.js, system design, backend"
+        placeholder={labels.stackPlaceholder}
       />
 
       <Button
@@ -58,7 +101,7 @@ export function MentorshipForm({ action }: { action: Action }) {
         iconPosition="left"
         className="self-start h-11 px-6"
       >
-        {isPending ? 'Enviando...' : 'Enviar candidatura'}
+        {isPending ? 'Enviando...' : labels.submitLabel}
       </Button>
     </form>
   )

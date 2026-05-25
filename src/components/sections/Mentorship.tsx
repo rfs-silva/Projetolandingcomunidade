@@ -63,7 +63,7 @@ const Mentorship: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
           <AuthGate
-            authedHref="/dashboard/mentoria"
+            authedHref="/dashboard/mentoria?tab=mentee"
             title="Candidate-se à mentoria"
             description="O programa de mentoria é exclusivo para membros. Entre com sua conta GitHub para se candidatar."
           >
@@ -73,7 +73,7 @@ const Mentorship: React.FC = () => {
           </AuthGate>
 
           <AuthGate
-            authedHref="/dashboard/mentoria"
+            authedHref="/dashboard/mentoria?tab=mentor"
             title="Inscreva-se como mentor"
             description="Só membros podem se inscrever como mentores. Entre com sua conta GitHub para começar."
           >
