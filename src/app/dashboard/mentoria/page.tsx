@@ -53,13 +53,14 @@ const STATUS: Record<
 
 export default async function MentorshipPage() {
   const { userId } = await requireDashboardSession('/dashboard/mentoria')
-  const application = await mentorshipService.getLatest(userId)
+  const application = await mentorshipService.getLatest(userId, 'MENTEE')
 
   async function applyAction(formData: FormData): Promise<{ error?: string } | void> {
     'use server'
     const { userId } = await requireDashboardSession('/dashboard/mentoria')
 
     const raw = {
+      kind: 'MENTEE' as const,
       goal: formData.get('goal'),
       availability: formData.get('availability'),
       stack: formData.get('stack'),

@@ -7,8 +7,11 @@ export const applicationStatusSchema = z.enum([
   'REJECTED',
 ])
 
+export const mentorshipKindSchema = z.enum(['MENTOR', 'MENTEE'])
+
 export const mentorshipApplicationSchema = z.object({
   id: z.string().uuid(),
+  kind: mentorshipKindSchema,
   goal: z.string(),
   availability: z.string(),
   stack: z.string(),
@@ -18,11 +21,12 @@ export const mentorshipApplicationSchema = z.object({
 })
 
 export const mentorshipApplyInputSchema = z.object({
+  kind: mentorshipKindSchema,
   goal: z
     .string()
     .trim()
-    .min(20, 'Conte pelo menos 20 caracteres sobre seu objetivo')
-    .max(500, 'Objetivo muito longo (máx. 500 caracteres)'),
+    .min(20, 'Conte pelo menos 20 caracteres')
+    .max(500, 'Texto muito longo (máx. 500 caracteres)'),
   availability: z
     .string()
     .trim()
@@ -31,10 +35,11 @@ export const mentorshipApplyInputSchema = z.object({
   stack: z
     .string()
     .trim()
-    .min(2, 'Liste pelo menos uma tecnologia')
+    .min(2, 'Liste pelo menos uma tecnologia ou área')
     .max(200, 'Texto muito longo'),
 })
 
 export type ApplicationStatus = z.infer<typeof applicationStatusSchema>
+export type MentorshipKind = z.infer<typeof mentorshipKindSchema>
 export type MentorshipApplicationDto = z.infer<typeof mentorshipApplicationSchema>
 export type MentorshipApplyInput = z.infer<typeof mentorshipApplyInputSchema>

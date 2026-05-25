@@ -9,7 +9,9 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
   try {
     const userId = await requireUserId()
-    const application = await mentorshipService.getLatest(userId)
+    // Compat: retorna a última candidatura como mentorado.
+    // M2 estende para retornar { mentor, mentee }.
+    const application = await mentorshipService.getLatest(userId, 'MENTEE')
     return ok(application)
   } catch (error) {
     return handleError(error)
