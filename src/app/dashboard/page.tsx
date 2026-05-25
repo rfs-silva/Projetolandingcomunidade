@@ -5,6 +5,7 @@ import {
   FolderGit2,
   Lightbulb,
   Pencil,
+  Shield,
   Sparkles,
   Target,
   Users,
@@ -12,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { UserAvatar } from '@/components/ui/UserAvatar'
 import { requireDashboardSession } from '@/server/lib/dashboard-session'
+import { isAdminType } from '@/server/lib/admin-session'
 
 export const metadata = {
   title: 'Painel · Comunidade Roraima',
@@ -28,16 +30,34 @@ const PROFILE_TYPE_LABEL: Record<string, string> = {
 
 export default async function DashboardPage() {
   const { profile, image, githubUsername } = await requireDashboardSession('/dashboard')
+  const isAdmin = isAdminType(profile.type)
 
   return (
     <section className="mx-auto max-w-7xl px-6 py-10">
-      <h1 className="text-3xl font-semibold text-foreground">
-        Olá, {profile.displayName.split(' ')[0]} 👋
-      </h1>
-      <p className="mt-2 text-muted-foreground">
-        Sua área de membro. Mantenha seu perfil atualizado para que outros
-        devs te encontrem.
-      </p>
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-semibold text-foreground">
+            Olá, {profile.displayName.split(' ')[0]} 👋
+          </h1>
+          <p className="mt-2 text-muted-foreground">
+            Sua área de membro. Mantenha seu perfil atualizado para que outros
+            devs te encontrem.
+          </p>
+        </div>
+        {isAdmin ? (
+          <Link href="/admin" className="shrink-0">
+            <Button
+              type="button"
+              variant="outline-primary"
+              size="sm"
+              icon={<Shield size={16} />}
+              iconPosition="left"
+            >
+              Painel admin
+            </Button>
+          </Link>
+        ) : null}
+      </div>
 
       <div className="mt-10 rounded-2xl border border-subtle bg-card p-6 md:p-8">
         <div className="flex flex-col md:flex-row md:items-center gap-6">
