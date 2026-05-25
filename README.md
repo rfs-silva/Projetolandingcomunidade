@@ -1,14 +1,14 @@
 # Comunidade Roraima Devs
 
 Plataforma da comunidade de desenvolvedores de Roraima — landing pública,
-mentoria, desafios, eventos e mural de membros/projetos.
+área de membros, mentoria, mural de projetos e mural de membros.
 
 ## Stack
 
-- **Next.js 16** (App Router, Route Handlers para API)
+- **Next.js 16** (App Router · Route Handlers · Server Components/Actions)
 - **TypeScript** + **Zod** (validação de contratos)
 - **Tailwind CSS v4** + **shadcn/ui** + Radix UI
-- **PostgreSQL 16** + **Prisma 6** (migrations versionadas)
+- **PostgreSQL 16** + **Prisma 6** (migrations versionadas, seed idempotente)
 - **Auth.js v5** (NextAuth) com GitHub OAuth (JWT)
 - **Docker Compose** (Postgres + web)
 
@@ -20,19 +20,18 @@ mentoria, desafios, eventos e mural de membros/projetos.
 ## Setup rápido
 
 ```bash
-# 1. Copie o exemplo de envs
+# 1. Variáveis de ambiente
 cp .env.example .env
+# Preencha AUTH_GITHUB_ID e AUTH_GITHUB_SECRET (ver seção abaixo)
 
-# 2. (Opcional para landing) crie o OAuth App no GitHub — ver seção abaixo
-#    Preencha AUTH_GITHUB_ID e AUTH_GITHUB_SECRET no .env
-
-# 3. Suba o stack (Postgres + web). Migrations e seed rodam automaticamente.
+# 2. Sobe Postgres + web (migrations e seed rodam no startup)
 docker compose up -d
 
-# 4. Acesse
-#    Landing: http://localhost:3000
-#    Login:   http://localhost:3000/login
-#    API:     http://localhost:3000/api/health
+# 3. Acesse
+#    Landing:           http://localhost:3000
+#    Login:             http://localhost:3000/login
+#    Painel do membro:  http://localhost:3000/dashboard
+#    API health:        http://localhost:3000/api/health
 ```
 
 ## Estrutura
@@ -40,46 +39,71 @@ docker compose up -d
 ```
 src/
 ├── app/
-│   ├── page.tsx                  # Landing pública
-│   ├── login/                    # Página de login (GitHub)
-│   ├── dashboard/                # Área de membro (protegida)
-│   └── api/                      # Route Handlers REST
-│       ├── auth/[...nextauth]/   # Auth.js handlers
-│       ├── health/
-│       ├── events/[number]/
-│       ├── challenges/[number]/
-│       └── projects/[id]/
-├── auth.ts                       # Config Auth.js (GitHub + JWT + upsert User)
-├── middleware.ts                 # Protege /dashboard
+│   ├── page.tsx                    # Landing pública (Hero/Lideranças/Eventos/...)
+│   ├── (legais)
+│   │   ├── manifesto/              # /manifesto
+│   │   ├── termos/                 # /termos
+│   │   └── privacidade/            # /privacidade
+│   ├── login/                      # Login GitHub
+│   ├── onboarding/                 # Aceite de termos + tipo de perfil
+│   ├── dashboard/                  # Área protegida
+│   │   ├── page.tsx                # Painel com resumo do perfil + cards
+│   │   ├── profile/                # Editar perfil + tags
+│   │   ├── membros/                # Mural de membros (filtros + paginação)
+│   │   ├── eventos/                # Lista com PUBLIC + MEMBERS
+│   │   ├── desafios/               # Lista com PUBLIC + MEMBERS
+│   │   ├── mentoria/               # Candidatura + status
+│   │   └── projetos/               # CRUD de projetos do membro
+│   └── api/
+│       ├── auth/[...nextauth]/     # Auth.js handlers
+│       ├── health/                 # Healthcheck (verifica DB)
+│       ├── tags/                   # GET (público)
+│       ├── events/                 # GET (apenas PUBLIC)
+│       ├── challenges/             # GET (apenas PUBLIC)
+│       ├── projects/               # GET (apenas PUBLIC)
+│       ├── categories/             # GET (público)
+│       ├── members/                # GET (auth: PUBLIC+MEMBERS)
+│       └── me/                     # Tudo de "eu" (auth required)
+│           ├── profile/            # GET/PUT + tags POST/DELETE
+│           ├── events/             # GET (PUBLIC+MEMBERS)
+│           ├── challenges/         # GET (PUBLIC+MEMBERS)
+│           ├── mentorship/         # GET/POST
+│           └── projects/           # GET/POST + [id] GET/PUT/DELETE
+├── auth.ts                         # Config Auth.js (GitHub + JWT + upsert User)
+├── middleware.ts                   # Protege /dashboard e /onboarding
 ├── components/
-│   ├── layout/                   # Header (session-aware), Footer
-│   ├── sections/                 # Hero, About, Events, Challenges, Showcase, Mentorship
-│   ├── ui/                       # button, avatar (shadcn)
+│   ├── layout/                     # Header (session-aware) + Footer
+│   ├── sections/                   # Hero, About, Leaders, Events, Challenges, Showcase, Mentorship
+│   ├── ui/                         # button, avatar, UserAvatar, dialog
+│   ├── auth/AuthGate.tsx           # Modal de login pra CTAs exclusivas
 │   └── providers/AuthProvider.tsx
 └── server/
-    ├── lib/prisma.ts             # Singleton do Prisma client
-    ├── http/                     # response.ts, errors.ts
-    ├── schemas/                  # Zod schemas (DTOs + validação)
-    ├── repositories/             # Acesso a dados (Prisma)
-    └── services/                 # Regras de negócio
+    ├── lib/prisma.ts               # Singleton do Prisma client
+    ├── http/                       # response, errors, session helper
+    ├── schemas/                    # Zod (event, challenge, project, profile, tag, member, leader, mentorship)
+    ├── repositories/               # Prisma ↔ DTO
+    └── services/                   # Regras de negócio (async)
 
 prisma/
-├── schema.prisma                 # 10 modelos cobrindo MVP
-├── seed.ts                       # Seed idempotente
-└── migrations/                   # Migrations versionadas
+├── schema.prisma                   # 10 modelos cobrindo MVP
+├── seed.ts                         # Idempotente: 6 eventos, 5 desafios, 52 tags, 8 perfis seed
+└── migrations/                     # Versionadas
+
+content/
+└── leaders.json                    # Lideranças (versionadas, sem painel admin)
 ```
 
 ## Variáveis de ambiente
 
-Veja [.env.example](./.env.example) — todas documentadas.
+Veja [.env.example](./.env.example). Resumo:
 
-| Variável             | Descrição                                     | Obrigatória |
-| -------------------- | --------------------------------------------- | ----------- |
-| `DATABASE_URL`       | Conexão Postgres                              | Sim         |
-| `AUTH_SECRET`        | Chave para assinar JWT (32+ bytes base64)     | Sim         |
-| `AUTH_URL`           | URL pública (ex.: `http://localhost:3000`)    | Sim         |
-| `AUTH_GITHUB_ID`     | Client ID do GitHub OAuth App                 | Sim p/ login |
-| `AUTH_GITHUB_SECRET` | Client Secret do GitHub OAuth App             | Sim p/ login |
+| Variável             | Descrição                                       | Obrigatória |
+| -------------------- | ----------------------------------------------- | ----------- |
+| `DATABASE_URL`       | Conexão Postgres                                | Sim         |
+| `AUTH_SECRET`        | Chave JWT (32+ bytes base64)                    | Sim         |
+| `AUTH_URL`           | URL pública (ex.: `http://localhost:3000`)      | Sim         |
+| `AUTH_GITHUB_ID`     | Client ID do GitHub OAuth App                   | Sim p/ login |
+| `AUTH_GITHUB_SECRET` | Client Secret do GitHub OAuth App               | Sim p/ login |
 
 Gerar `AUTH_SECRET`:
 
@@ -89,76 +113,92 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 
 ## Setup do GitHub OAuth App
 
-1. Acesse https://github.com/settings/developers → **New OAuth App**
-2. Preencha:
-   - **Application name**: Comunidade Roraima Devs (Local)
-   - **Homepage URL**: `http://localhost:3000`
-   - **Authorization callback URL**: `http://localhost:3000/api/auth/callback/github`
-3. Após criar, gere um **Client Secret**.
-4. Cole `Client ID` em `AUTH_GITHUB_ID` e `Client Secret` em `AUTH_GITHUB_SECRET` no `.env`.
-5. Reinicie o stack: `docker compose restart web`.
+1. https://github.com/settings/developers → **New OAuth App**
+2. **Homepage URL**: `http://localhost:3000`
+3. **Authorization callback URL**: `http://localhost:3000/api/auth/callback/github`
+4. Cole `Client ID` e `Client Secret` no `.env`
+5. `docker compose restart web`
 
-> Para produção, crie um OAuth App separado com a URL pública e callback correspondente.
+## API REST
 
-## API
-
-Resposta de sucesso:
+### Respostas padronizadas
 
 ```json
-{ "data": ..., "meta": { "total": N } }
-```
-
-Resposta de erro:
-
-```json
+{ "data": ..., "meta": { "total": N, "page": 1, "pageSize": 12, "totalPages": 3 } }
 { "error": { "code": "NOT_FOUND", "message": "...", "details": ... } }
 ```
 
-| Método | Rota                                  | Descrição                              |
-| ------ | ------------------------------------- | -------------------------------------- |
-| GET    | `/api/health`                         | Healthcheck (verifica DB)              |
-| GET    | `/api/events?type=Remoto\|Presencial` | Lista eventos                          |
-| GET    | `/api/events/:number`                 | Evento por número (`01`, `02`...)      |
-| GET    | `/api/challenges`                     | Lista desafios                         |
-| GET    | `/api/challenges/:number`             | Desafio por número                     |
-| GET    | `/api/projects?category=...`          | Lista projetos públicos                |
-| GET    | `/api/projects/:id`                   | Projeto por UUID                       |
-| GET    | `/api/categories`                     | Categorias de projeto                  |
-| `*`    | `/api/auth/*`                         | Endpoints Auth.js (signin, callback…)  |
+### Endpoints públicos (sem auth)
+
+| Método | Rota                          | O que faz                                          |
+| ------ | ----------------------------- | -------------------------------------------------- |
+| GET    | `/api/health`                 | Healthcheck (verifica DB)                          |
+| GET    | `/api/tags?category=&q=`      | Lista tags com filtro/busca                        |
+| GET    | `/api/categories`             | Categorias de projeto                              |
+| GET    | `/api/events?type=`           | Eventos públicos                                   |
+| GET    | `/api/events/:number`         | Evento público específico                          |
+| GET    | `/api/challenges`             | Desafios públicos                                  |
+| GET    | `/api/challenges/:number`     | Desafio público específico                         |
+| GET    | `/api/projects?category=`     | Projetos PUBLIC                                    |
+| GET    | `/api/projects/:id`           | Projeto público                                    |
+
+### Endpoints autenticados
+
+| Método | Rota                                | O que faz                                       |
+| ------ | ----------------------------------- | ----------------------------------------------- |
+| GET    | `/api/members?type=&tags=&q=&page=` | Mural de membros com filtros + paginação        |
+| GET    | `/api/me/profile`                   | Perfil do usuário atual                         |
+| PUT    | `/api/me/profile`                   | Atualiza perfil                                 |
+| POST   | `/api/me/profile/tags`              | Adiciona tag ao perfil (`{ tagId }`)            |
+| DELETE | `/api/me/profile/tags/:tagId`       | Remove tag                                      |
+| GET    | `/api/me/events`                    | Todos os eventos (PUBLIC + MEMBERS)             |
+| GET    | `/api/me/challenges`                | Todos os desafios (PUBLIC + MEMBERS)            |
+| GET    | `/api/me/mentorship`                | Última candidatura à mentoria                   |
+| POST   | `/api/me/mentorship`                | Envia candidatura à mentoria                    |
+| GET    | `/api/me/projects`                  | Meus projetos                                   |
+| POST   | `/api/me/projects`                  | Cria projeto                                    |
+| GET    | `/api/me/projects/:id`              | Projeto específico (com tagIds)                 |
+| PUT    | `/api/me/projects/:id`              | Atualiza projeto                                |
+| DELETE | `/api/me/projects/:id`              | Exclui projeto                                  |
+| `*`    | `/api/auth/*`                       | Endpoints Auth.js (signin, callback…)           |
 
 ## Scripts npm
 
-| Script                 | O que faz                                       |
-| ---------------------- | ----------------------------------------------- |
-| `npm run dev`          | Next.js em modo dev                             |
-| `npm run build`        | Build de produção                               |
-| `npm run lint`         | ESLint                                          |
-| `npm run prisma:generate` | Gera o Prisma Client                        |
-| `npm run prisma:migrate`  | Cria/aplica migration em dev (`migrate dev`) |
-| `npm run prisma:deploy`   | Aplica migrations em prod                    |
-| `npm run prisma:studio`   | Abre o Prisma Studio                         |
-| `npm run db:seed`         | Roda o seed (idempotente)                    |
-| `npm run db:reset`        | Zera o banco e reaplica migrations + seed    |
+```bash
+npm run dev                # Next.js dev
+npm run build              # Build prod
+npm run lint               # ESLint
+npm run prisma:generate    # Gera Prisma Client
+npm run prisma:migrate     # migrate dev
+npm run prisma:deploy      # migrate deploy (prod)
+npm run prisma:studio      # GUI do banco
+npm run db:seed            # Roda o seed idempotente
+npm run db:reset           # Zera e reaplica migrations + seed
+```
 
 ## Comandos Docker
 
 ```bash
-docker compose up -d          # sobe Postgres + web
-docker compose logs -f web    # acompanha o app
-docker compose restart web    # reinicia só o web (após mudar .env)
-docker compose down           # para tudo
-docker compose down -v        # zera o volume do Postgres
+docker compose up -d              # sobe Postgres + web
+docker compose logs -f web        # acompanha logs
+docker compose restart web        # após mudar .env
+docker compose down               # para tudo
+docker compose down -v            # zera volume do Postgres
 ```
 
 ## Gitflow
 
-Este projeto segue Gitflow — branches `main`, `develop`, `homol`. Detalhes em
-[GITFLOW.md](./GITFLOW.md).
+Branches `main`, `develop`, `homol`. Features saem de `develop`.
+Detalhes em [GITFLOW.md](./GITFLOW.md).
 
-## Roadmap
+## Roadmap MVP
 
-Backlog organizado em épicos E0..E8. Status atual:
-
-- ✅ E0 — Fundação (Docker, Postgres, Prisma, migrations, seed)
-- 🚧 E1 — Auth GitHub (infra pronta — falta criar OAuth App)
-- ⏳ E2..E8 — Próximos sprints
+- ✅ **E0** Fundação (Docker, Postgres, Prisma, migrations, seed)
+- ✅ **E1** Auth GitHub + onboarding + termos/privacidade
+- ✅ **E2** Landing pública (Hero, Lideranças, Eventos, Desafios, Mentoria, Manifesto, Modal gating)
+- ✅ **E3** Perfil completo (editar + 52 tags + multi-select)
+- ✅ **E4** Mural de membros (filtros + busca + paginação)
+- ✅ **E5** Eventos/desafios exclusivos (visibility PUBLIC/MEMBERS)
+- ✅ **E6** Mentoria (candidatura + status)
+- ✅ **E7** Mural de projetos (CRUD próprio + visibilidade)
+- ✅ **E8** Polimento e documentação
