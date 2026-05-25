@@ -1,13 +1,17 @@
 import 'server-only'
-import { MentorshipKind as DbKind } from '@prisma/client'
+import {
+  ApplicationStatus as DbStatus,
+  MentorshipKind as DbKind,
+} from '@prisma/client'
 import { prisma } from '@/server/lib/prisma'
 import {
   mentorshipApplicationSchema,
   mentorshipApplyInputSchema,
+  type ApplicationStatus,
   type MentorshipApplicationDto,
   type MentorshipKind,
 } from '@/server/schemas/mentorship.schema'
-import { AppError } from '@/server/http/errors'
+import { AppError, NotFoundError } from '@/server/http/errors'
 
 const OPEN_STATUSES = ['SUBMITTED', 'IN_REVIEW'] as const
 
@@ -64,5 +68,61 @@ export const mentorshipService = {
       },
     })
     return mentorshipApplicationSchema.parse(row)
+  },
+
+  async listAdmin(filters: {
+    status?: ApplicationStatus
+    kind?: MentorshipKind
+  }) {
+    const rows = await prisma.mentorshipApplication.findMany({
+      where: {
+        ...(filters.status ? { status: DbStatus[filters.status] } : {}),
+        ...(filters.kind ? { kind: DbKind[filters.kind] } : {}),
+      },
+      include: {
+        user: {
+          select: {
+            githubUsername: true,
+            avatarUrl: true,
+            profile: { select: { displayName: true, type: true } },
+          },
+        },
+      },
+      orderBy: [{ status: 'asc' }, { createdAt: 'desc' }],
+    })
+    return rows.map((row) => ({
+      ...mentorshipApplicationSchema.parse({
+        id: row.id,
+        kind: row.kind,
+        goal: row.goal,
+        availability: row.availability,
+        stack: row.stack,
+        status: row.status,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt,
+      }),
+      user: {
+        githubUsername: row.user.githubUsername,
+        avatarUrl: row.user.avatarUrl,
+        displayName: row.user.profile?.displayName ?? row.user.githubUsername,
+        type: row.user.profile?.type ?? null,
+      },
+    }))
+  },
+
+  async updateStatus(
+    applicationId: string,
+    status: ApplicationStatus,
+  ): Promise<MentorshipApplicationDto> {
+    const existing = await prisma.mentorshipApplication.findUnique({
+      where: { id: applicationId },
+    })
+    if (!existing) throw new NotFoundError('Candidatura')
+
+    const updated = await prisma.mentorshipApplication.update({
+      where: { id: applicationId },
+      data: { status: DbStatus[status] },
+    })
+    return mentorshipApplicationSchema.parse(updated)
   },
 }
