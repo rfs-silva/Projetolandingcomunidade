@@ -386,6 +386,11 @@ async function main() {
     })
   }
 
+  // Data fixa para usuários de seed: representa o momento em que esses perfis
+  // foram pré-cadastrados pela organização (não passaram pelo onboarding real).
+  // Não usar Date.now() para que o seed seja determinístico entre execuções.
+  const SEED_TERMS_ACCEPTED_AT = new Date('2026-01-01T00:00:00Z')
+
   console.log('▶ Seeding users + profiles + projects...')
   for (const seed of SEED_USERS) {
     const user = await prisma.user.upsert({
@@ -393,13 +398,13 @@ async function main() {
       update: {
         githubUsername: seed.githubUsername,
         avatarUrl: seed.avatarUrl,
-        acceptedTermsAt: new Date(),
+        acceptedTermsAt: SEED_TERMS_ACCEPTED_AT,
       },
       create: {
         githubId: seed.githubId,
         githubUsername: seed.githubUsername,
         avatarUrl: seed.avatarUrl,
-        acceptedTermsAt: new Date(),
+        acceptedTermsAt: SEED_TERMS_ACCEPTED_AT,
       },
     })
 
