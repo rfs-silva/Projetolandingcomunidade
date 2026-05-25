@@ -179,10 +179,11 @@ export default async function DashboardPage() {
             title="Mentoria"
             desc="Candidate-se ao programa de mentoria."
           />
-          <ComingSoonCard
+          <ActiveCard
+            href="/dashboard/projetos"
             icon={<FolderGit2 size={20} />}
             title="Mural de projetos"
-            desc="Publique e descubra projetos da comunidade."
+            desc="Publique seus projetos e veja os da comunidade."
           />
         </div>
 
@@ -206,31 +207,6 @@ export default async function DashboardPage() {
         </div>
       </section>
     </main>
-  )
-}
-
-function ComingSoonCard({
-  icon,
-  title,
-  desc,
-}: {
-  icon: React.ReactNode
-  title: string
-  desc: string
-}) {
-  return (
-    <div className="rounded-2xl border border-subtle bg-card p-6 opacity-70">
-      <div className="w-10 h-10 rounded-lg bg-background-secondary border border-subtle flex items-center justify-center text-muted-foreground mb-3">
-        {icon}
-      </div>
-      <div className="flex items-center gap-2">
-        <h4 className="text-base font-medium text-foreground">{title}</h4>
-        <span className="text-[9px] uppercase tracking-wider text-muted-foreground bg-background-secondary border border-subtle px-1.5 py-0.5 rounded">
-          Em breve
-        </span>
-      </div>
-      <p className="mt-1 text-sm text-muted-foreground">{desc}</p>
-    </div>
   )
 }
 

@@ -44,7 +44,7 @@ const Showcase: React.FC<ShowcaseProps> = ({ projects, categories }) => {
           </div>
           <div className="shrink-0 w-full md:w-auto">
             <AuthGate
-              authedHref="/dashboard"
+              authedHref="/dashboard/projetos/novo"
               title="Divulgue seu projeto"
               description="O mural de projetos é para membros da comunidade. Entre com sua conta GitHub para publicar."
             >
