@@ -1,7 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ArrowLeft, ExternalLink, Github, LogOut, Pencil, Plus, Lock, Globe2 } from 'lucide-react'
+import { ArrowLeft, ExternalLink, LogOut, Pencil, Plus, Lock, Globe2 } from 'lucide-react'
+import { GithubIcon } from '@/components/icons/brand'
 import { auth, signOut } from '@/auth'
 import { Button } from '@/components/ui/button'
 import { UserAvatar } from '@/components/ui/UserAvatar'
@@ -206,7 +207,7 @@ export default async function ProjectsPage() {
                         href={project.repoUrl}
                         className="flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-background-secondary text-zinc-300 text-xs font-medium hover:bg-zinc-700 hover:text-foreground transition-colors"
                       >
-                        <Github size={14} />
+                        <GithubIcon size={14} />
                       </Link>
                     ) : null}
                   </div>

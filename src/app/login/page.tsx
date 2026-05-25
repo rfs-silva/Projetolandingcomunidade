@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Github } from 'lucide-react'
+import { GithubIcon } from '@/components/icons/brand'
 import { auth, signIn } from '@/auth'
 import { Button } from '@/components/ui/button'
 
@@ -59,7 +59,7 @@ export default async function LoginPage({
           <Button
             type="submit"
             variant="default"
-            icon={<Github size={18} />}
+            icon={<GithubIcon size={18} />}
             iconPosition="left"
             className="w-full h-12 text-base"
           >

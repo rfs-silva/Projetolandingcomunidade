@@ -1,6 +1,12 @@
 'use client'
 
-import { Facebook, Github, Instagram, Linkedin, Twitter } from 'lucide-react'
+import {
+  FacebookIcon,
+  GithubIcon,
+  InstagramIcon,
+  LinkedinIcon,
+  TwitterIcon,
+} from '@/components/icons/brand'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -8,23 +14,23 @@ import React from 'react'
 const socialMediaLinks = [
   {
     name: 'LinkedIn',
-    icon: Linkedin,
+    icon: LinkedinIcon,
     url: 'https://www.linkedin.com/company/roraimafullstack',
   },
-  { name: 'Twitter', icon: Twitter, url: '#' },
+  { name: 'Twitter', icon: TwitterIcon, url: '#' },
   {
     name: 'GitHub',
-    icon: Github,
+    icon: GithubIcon,
     url: 'https://github.com/roraimafullstackdevs',
   },
   {
     name: 'Instagram',
-    icon: Instagram,
+    icon: InstagramIcon,
     url: 'https://www.instagram.com/roraimafullstackdevs/',
   },
   {
     name: 'Facebook',
-    icon: Facebook,
+    icon: FacebookIcon,
     url: 'https://www.facebook.com/share/1C6DU2paFr/',
   },
 ]

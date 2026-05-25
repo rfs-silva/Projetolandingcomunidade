@@ -5,7 +5,8 @@ import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { UserAvatar } from '@/components/ui/UserAvatar'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { ExternalLink, Github, Globe, Plus, Search } from 'lucide-react'
+import { ExternalLink, Globe, Plus, Search } from 'lucide-react'
+import { GithubIcon } from '@/components/icons/brand'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState } from 'react'
@@ -155,7 +156,7 @@ const Showcase: React.FC<ShowcaseProps> = ({ projects, categories }) => {
                     href={project.repoUrl}
                     className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-background-secondary text-zinc-300 text-xs font-medium hover:bg-zinc-700 hover:text-foreground transition-all"
                   >
-                    <Github size={14} /> Código
+                    <GithubIcon size={14} /> Código
                   </Link>
                 </div>
               </div>

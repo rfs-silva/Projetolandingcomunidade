@@ -1,4 +1,4 @@
-import { Github, Linkedin } from 'lucide-react'
+import { GithubIcon, LinkedinIcon } from '@/components/icons/brand'
 import Link from 'next/link'
 import React from 'react'
 import { UserAvatar } from '@/components/ui/UserAvatar'
@@ -59,7 +59,7 @@ const Leaders: React.FC<LeadersProps> = ({ leaders }) => {
                       aria-label={`GitHub de ${leader.name}`}
                       className="p-2 rounded-lg bg-background-secondary text-zinc-300 hover:bg-primary hover:text-foreground transition-all"
                     >
-                      <Github size={16} />
+                      <GithubIcon size={16} />
                     </Link>
                   )}
                   {leader.linkedinUrl && (
@@ -69,7 +69,7 @@ const Leaders: React.FC<LeadersProps> = ({ leaders }) => {
                       aria-label={`LinkedIn de ${leader.name}`}
                       className="p-2 rounded-lg bg-background-secondary text-zinc-300 hover:bg-primary hover:text-foreground transition-all"
                     >
-                      <Linkedin size={16} />
+                      <LinkedinIcon size={16} />
                     </Link>
                   )}
                 </div>

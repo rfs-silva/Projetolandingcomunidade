@@ -1,7 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ArrowLeft, ChevronLeft, ChevronRight, Linkedin, LogOut, Github } from 'lucide-react'
+import { ArrowLeft, ChevronLeft, ChevronRight, LogOut } from 'lucide-react'
+import { GithubIcon, LinkedinIcon } from '@/components/icons/brand'
 import { auth, signOut } from '@/auth'
 import { Button } from '@/components/ui/button'
 import { UserAvatar } from '@/components/ui/UserAvatar'
@@ -215,7 +216,7 @@ export default async function MembersPage({
                       href={member.linkedinUrl}
                       className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-background-secondary text-zinc-300 text-xs font-medium hover:bg-primary hover:text-foreground transition-colors"
                     >
-                      <Linkedin size={14} /> LinkedIn
+                      <LinkedinIcon size={14} /> LinkedIn
                     </Link>
                   ) : null}
                   <Link
@@ -223,7 +224,7 @@ export default async function MembersPage({
                     href={`https://github.com/${member.githubUsername}`}
                     className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-background-secondary text-zinc-300 text-xs font-medium hover:bg-zinc-700 hover:text-foreground transition-colors"
                   >
-                    <Github size={14} /> GitHub
+                    <GithubIcon size={14} /> GitHub
                   </Link>
                 </div>
               </article>

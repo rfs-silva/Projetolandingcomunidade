@@ -3,7 +3,8 @@
 import { useState, type ReactNode } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { Github, Lock } from 'lucide-react'
+import { Lock } from 'lucide-react'
+import { GithubIcon } from '@/components/icons/brand'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -69,7 +70,7 @@ export function AuthGate({
             <Link href={`/login?callbackUrl=${encodeURIComponent(authedHref)}`}>
               <Button
                 type="button"
-                icon={<Github size={18} />}
+                icon={<GithubIcon size={18} />}
                 iconPosition="left"
                 className="w-full h-11"
               >
