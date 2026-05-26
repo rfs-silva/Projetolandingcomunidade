@@ -4,6 +4,7 @@ import {
   Calendar,
   FolderGit2,
   Lightbulb,
+  MessageSquare,
   Pencil,
   Shield,
   Sparkles,
@@ -155,6 +156,12 @@ export default async function DashboardPage() {
           icon={<FolderGit2 size={20} />}
           title="Mural de projetos"
           desc="Publique seus projetos e veja os da comunidade."
+        />
+        <ActiveCard
+          href="/dashboard/forum"
+          icon={<MessageSquare size={20} />}
+          title="Fórum"
+          desc="Discussões, dúvidas e anúncios da comunidade."
         />
       </div>
 

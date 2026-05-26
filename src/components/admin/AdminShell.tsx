@@ -17,6 +17,7 @@ type NavItem = {
 const NAV: NavItem[] = [
   { href: '/admin', label: 'Visão geral' },
   { href: '/admin/mentoria', label: 'Mentoria' },
+  { href: '/admin/forum', label: 'Fórum' },
   { href: '/admin/usuarios', label: 'Usuários' },
   { href: '/admin/eventos', label: 'Eventos' },
   { href: '/admin/desafios', label: 'Desafios' },

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowLeft, Lock, MessageSquare, Pencil, Pin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { UserAvatar } from '@/components/ui/UserAvatar'
+import { Markdown } from '@/components/Markdown'
 import { requireDashboardSession } from '@/server/lib/dashboard-session'
 import { isAdminType } from '@/server/lib/admin-session'
 import { forumService } from '@/server/services/forum.service'
@@ -109,9 +110,7 @@ export default async function ThreadPage({
         </header>
 
         <div className="rounded-xl border border-subtle bg-card p-6">
-          <pre className="whitespace-pre-wrap font-sans text-sm text-foreground/90 leading-relaxed">
-            {thread.body}
-          </pre>
+          <Markdown source={thread.body} />
         </div>
 
         <div className="flex items-center gap-2 text-sm text-muted-foreground pt-4 border-t border-subtle">

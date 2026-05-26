@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Check, Loader2, Pencil, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { UserAvatar } from '@/components/ui/UserAvatar'
+import { Markdown } from '@/components/Markdown'
 
 type ReplyAuthor = {
   id: string
@@ -159,9 +160,7 @@ export function ReplyItem({
           </div>
         </div>
       ) : (
-        <pre className="whitespace-pre-wrap font-sans text-sm text-foreground/90 leading-relaxed">
-          {reply.body}
-        </pre>
+        <Markdown source={reply.body} />
       )}
 
       {error && !isEditing ? <p className="text-xs text-destructive mt-2">{error}</p> : null}
