@@ -10,6 +10,8 @@ import {
   type ForumCategory,
 } from '@/server/schemas/forum.schema'
 import { cn } from '@/lib/utils'
+import { ReplyForm } from './ReplyForm'
+import { ReplyItem } from './ReplyItem'
 
 export const metadata = {
   title: 'Tópico · Fórum',
@@ -34,7 +36,8 @@ export default async function ThreadPage({
   const { id } = await params
   const { thread, replies } = await forumService.getById(id)
 
-  const canEdit = thread.author.id === userId || isAdminType(profile.type)
+  const isAdmin = isAdminType(profile.type)
+  const canEdit = thread.author.id === userId || isAdmin
 
   return (
     <section className="mx-auto max-w-3xl px-6 py-10">
@@ -121,29 +124,15 @@ export default async function ThreadPage({
         {replies.length > 0 ? (
           <div className="flex flex-col gap-4">
             {replies.map((r) => (
-              <div
+              <ReplyItem
                 key={r.id}
-                className="rounded-xl border border-subtle bg-card p-5"
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <UserAvatar
-                    src={r.author.avatarUrl}
-                    name={r.author.displayName}
-                    seed={r.author.githubUsername}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-foreground">
-                      {r.author.displayName}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {new Date(r.createdAt).toLocaleString('pt-BR')}
-                    </div>
-                  </div>
-                </div>
-                <pre className="whitespace-pre-wrap font-sans text-sm text-foreground/90 leading-relaxed">
-                  {r.body}
-                </pre>
-              </div>
+                reply={{
+                  ...r,
+                  createdAt: r.createdAt,
+                  updatedAt: r.updatedAt,
+                }}
+                canManage={r.author.id === userId || isAdmin}
+              />
             ))}
           </div>
         ) : null}
@@ -154,9 +143,7 @@ export default async function ThreadPage({
             Este tópico está fechado para novas respostas.
           </div>
         ) : (
-          <div className="rounded-xl border border-subtle bg-card/40 p-5 text-center text-sm text-muted-foreground">
-            Formulário de resposta chega no próximo passo (F4).
-          </div>
+          <ReplyForm threadId={thread.id} />
         )}
       </article>
     </section>
