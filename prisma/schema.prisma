@@ -56,6 +56,14 @@ enum MentorshipKind {
   MENTEE
 }
 
+enum ForumCategory {
+  GERAL
+  ANUNCIOS
+  AJUDA
+  CARREIRA
+  OFF_TOPIC
+}
+
 // ============================================================================
 // E1 - Auth & Users
 // ============================================================================
@@ -73,6 +81,8 @@ model User {
   profile                Profile?
   mentorshipApplications MentorshipApplication[]
   projects               UserProject[]
+  forumThreads           ForumThread[]
+  forumReplies           ForumReply[]
 }
 
 model Profile {
@@ -218,4 +228,42 @@ model MentorshipApplication {
 
   @@index([userId, kind])
   @@index([status])
+}
+
+// ============================================================================
+// Forum (Pos-MVP - threads + replies)
+// ============================================================================
+
+model ForumThread {
+  id           String        @id @default(uuid())
+  authorId     String
+  author       User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  title        String
+  body         String
+  category     ForumCategory @default(GERAL)
+  isPinned     Boolean       @default(false)
+  isLocked     Boolean       @default(false)
+  repliesCount Int           @default(0)
+  lastReplyAt  DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  replies      ForumReply[]
+
+  @@index([category])
+  @@index([isPinned, lastReplyAt(sort: Desc)])
+  @@index([authorId])
+}
+
+model ForumReply {
+  id        String      @id @default(uuid())
+  threadId  String
+  thread    ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([threadId, createdAt])
+  @@index([authorId])
 }
