@@ -3,9 +3,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LogOut, Shield } from 'lucide-react'
+import { Shield } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { Button } from '@/components/ui/button'
+import { SignOutButton } from '@/components/auth/SignOutButton'
 import { UserAvatar } from '@/components/ui/UserAvatar'
 import { cn } from '@/lib/utils'
 
@@ -28,13 +28,11 @@ export function AdminShell({
   displayName,
   image,
   seed,
-  signOutAction,
 }: {
   children: ReactNode
   displayName: string
   image?: string | null
   seed: string
-  signOutAction: () => Promise<void>
 }) {
   const pathname = usePathname()
 
@@ -61,17 +59,7 @@ export function AdminShell({
               ← Voltar ao painel
             </Link>
             <UserAvatar src={image} name={displayName} seed={seed} />
-            <form action={signOutAction}>
-              <Button
-                type="submit"
-                variant="ghost"
-                size="sm"
-                icon={<LogOut size={16} />}
-                iconPosition="left"
-              >
-                Sair
-              </Button>
-            </form>
+            <SignOutButton />
           </div>
         </div>
       </header>

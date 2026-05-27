@@ -1,9 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { LogOut } from 'lucide-react'
-import { signOut } from '@/auth'
-import { Button } from '@/components/ui/button'
 import { UserAvatar } from '@/components/ui/UserAvatar'
+import { SignOutButton } from '@/components/auth/SignOutButton'
 
 type Props = {
   image?: string | null
@@ -32,22 +30,7 @@ export function DashboardHeader({ image, displayName, seed }: Props) {
               {displayName}
             </span>
           </Link>
-          <form
-            action={async () => {
-              'use server'
-              await signOut({ redirectTo: '/' })
-            }}
-          >
-            <Button
-              type="submit"
-              variant="ghost"
-              size="sm"
-              icon={<LogOut size={16} />}
-              iconPosition="left"
-            >
-              Sair
-            </Button>
-          </form>
+          <SignOutButton />
         </div>
       </div>
     </header>
