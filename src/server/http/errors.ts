@@ -1,6 +1,6 @@
 import 'server-only'
 import { NextResponse } from 'next/server'
-import { ZodError } from 'zod'
+import { ZodError, type ZodIssue } from 'zod'
 
 export class AppError extends Error {
   constructor(
@@ -26,6 +26,24 @@ export class ValidationError extends AppError {
   }
 }
 
+const isProd = process.env.NODE_ENV === 'production'
+
+/**
+ * Em produção, vaza só o mínimo necessário para o cliente entender o erro.
+ * Detalhes técnicos vão pro log do servidor; o cliente recebe versão sanitizada.
+ */
+function sanitizeZodIssues(issues: ZodIssue[]) {
+  if (!isProd) {
+    return issues
+  }
+  // Em prod, devolve apenas { path, message } sem o tipo interno do Zod
+  // (que vaza estrutura: "invalid_enum_value", expected/received, etc).
+  return issues.map((i) => ({
+    path: Array.isArray(i.path) ? i.path.join('.') : String(i.path),
+    message: i.message,
+  }))
+}
+
 export function handleError(error: unknown) {
   if (error instanceof AppError) {
     return NextResponse.json(
@@ -46,19 +64,28 @@ export function handleError(error: unknown) {
         error: {
           code: 'VALIDATION_ERROR',
           message: 'Dados inválidos',
-          details: error.issues,
+          details: sanitizeZodIssues(error.issues),
         },
       },
       { status: 422 },
     )
   }
 
-  console.error('[API] Unexpected error:', error)
+  // Log estruturado (server-side) — nunca devolver stack pro cliente.
+  console.error('[api] erro inesperado:', {
+    name: error instanceof Error ? error.name : 'Unknown',
+    message: error instanceof Error ? error.message : String(error),
+    // stack só em dev, pra ajudar no debug local
+    ...(isProd
+      ? {}
+      : { stack: error instanceof Error ? error.stack : undefined }),
+  })
+
   return NextResponse.json(
     {
       error: {
         code: 'INTERNAL_ERROR',
-        message: 'Erro interno do servidor',
+        message: 'Não foi possível processar sua solicitação.',
       },
     },
     { status: 500 },
