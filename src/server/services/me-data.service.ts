@@ -1,6 +1,7 @@
 import 'server-only'
 import { prisma } from '@/server/lib/prisma'
 import { AppError, NotFoundError } from '@/server/http/errors'
+import { privacyEventsService } from '@/server/services/privacy-events.service'
 
 export const DELETE_ACCOUNT_PHRASE = 'EXCLUIR MINHA CONTA'
 
@@ -98,8 +99,19 @@ export const meDataService = {
 
     if (!user) throw new NotFoundError('Usuário')
 
+    const exportedAt = new Date()
+    await privacyEventsService.record({
+      type: 'DATA_EXPORTED',
+      subject: {
+        userId: user.id,
+        githubId: user.githubId,
+        githubUsername: user.githubUsername,
+      },
+      actor: { userId: user.id, githubId: user.githubId },
+    })
+
     return {
-      exportedAt: new Date().toISOString(),
+      exportedAt: exportedAt.toISOString(),
       schemaVersion: '1.0',
       controller: {
         name: 'Comunidade Roraima Devs',
@@ -216,6 +228,26 @@ export const meDataService = {
     ])
 
     await prisma.user.delete({ where: { id: userId } })
+
+    // Grava o evento APÓS a exclusão. Como o índice usa subjectGithubId (não FK),
+    // sobrevive ao usuário deletado e fica disponível pra comprovação.
+    await privacyEventsService.record({
+      type: 'ACCOUNT_DELETED',
+      subject: {
+        userId: null,
+        githubId: existing.githubId,
+        githubUsername: existing.githubUsername,
+      },
+      actor: { userId, githubId: existing.githubId },
+      metadata: {
+        deletedCounts: {
+          projetos: projectCount,
+          candidaturasMentoria: mentorshipCount,
+          topicosForum: threadCount,
+          respostasForum: replyCount,
+        },
+      },
+    })
 
     return {
       deletedCounts: {

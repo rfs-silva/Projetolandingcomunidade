@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { requireDashboardSession } from '@/server/lib/dashboard-session'
 import { meDataService } from '@/server/services/me-data.service'
+import { privacyEventsService } from '@/server/services/privacy-events.service'
 import { DeleteAccountForm } from './DeleteAccountForm'
 
 export const metadata = {
@@ -22,7 +23,10 @@ const DPO_EMAIL = 'privacidade@comunidaderoraima.dev'
 
 export default async function PrivacyPage() {
   const { userId, profile } = await requireDashboardSession('/dashboard/privacidade')
-  const payload = await meDataService.export(userId)
+  const [payload, events] = await Promise.all([
+    meDataService.export(userId),
+    privacyEventsService.listForUser(userId, 30),
+  ])
   const summary = meDataService.summary(payload)
 
   return (
@@ -195,9 +199,43 @@ export default async function PrivacyPage() {
         {/* Exclusão (zona de perigo) */}
         <DeleteAccountForm />
       </section>
+
+      {events.length > 0 ? (
+        <section className="mt-10">
+          <h2 className="text-sm uppercase tracking-wider text-muted-foreground mb-3">
+            Histórico de eventos de privacidade
+          </h2>
+          <div className="rounded-xl border border-subtle bg-card divide-y divide-subtle text-sm">
+            {events.map((ev) => (
+              <div
+                key={ev.id}
+                className="px-4 py-3 flex items-center justify-between gap-3"
+              >
+                <span className="text-foreground">
+                  {EVENT_LABEL[ev.type as keyof typeof EVENT_LABEL] ?? ev.type}
+                </span>
+                <span className="text-xs text-muted-foreground shrink-0">
+                  {new Date(ev.createdAt).toLocaleString('pt-BR')}
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Registro mantido conforme art. 37 da LGPD para comprovação de
+            operações de tratamento.
+          </p>
+        </section>
+      ) : null}
     </section>
   )
 }
+
+const EVENT_LABEL = {
+  TERMS_ACCEPTED: 'Aceitou os termos de uso',
+  DATA_EXPORTED: 'Exportou seus dados',
+  ACCOUNT_DELETED: 'Excluiu a conta',
+  PROFILE_TYPE_CHANGED: 'Tipo de perfil alterado',
+} as const
 
 function Row({ label, value }: { label: string; value: string }) {
   return (

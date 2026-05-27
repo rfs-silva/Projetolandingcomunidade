@@ -8,6 +8,7 @@ import {
   type ProfileDto,
 } from '@/server/schemas/profile.schema'
 import { AppError, NotFoundError } from '@/server/http/errors'
+import { privacyEventsService } from '@/server/services/privacy-events.service'
 
 const MAX_PROFILE_TAGS = 10
 
@@ -108,7 +109,7 @@ export const profileService = {
     const user = await prisma.user.findUnique({ where: { id: userId } })
     if (!user) throw new NotFoundError('Usuário')
 
-    return prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       await tx.user.update({
         where: { id: userId },
         data: { acceptedTermsAt: new Date() },
@@ -131,5 +132,17 @@ export const profileService = {
         },
       })
     })
+
+    await privacyEventsService.record({
+      type: 'TERMS_ACCEPTED',
+      subject: {
+        userId,
+        githubId: user.githubId,
+        githubUsername: user.githubUsername,
+      },
+      actor: { userId, githubId: user.githubId },
+    })
+
+    return result
   },
 }

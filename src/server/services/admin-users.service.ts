@@ -6,6 +6,7 @@ import {
   type ProfileType,
 } from '@/server/schemas/profile.schema'
 import { NotFoundError } from '@/server/http/errors'
+import { privacyEventsService } from '@/server/services/privacy-events.service'
 
 export type AdminUserRow = {
   userId: string
@@ -48,14 +49,43 @@ export const adminUsersService = {
   async updateType(
     userId: string,
     type: ProfileType,
+    actor?: { userId: string },
   ): Promise<{ userId: string; type: ProfileType }> {
-    const existing = await prisma.profile.findUnique({ where: { userId } })
+    const existing = await prisma.profile.findUnique({
+      where: { userId },
+      include: { user: { select: { githubId: true, githubUsername: true } } },
+    })
     if (!existing) throw new NotFoundError('Perfil')
+
+    const previousType = existing.type as ProfileType
 
     await prisma.profile.update({
       where: { userId },
       data: { type: DbProfileType[type] },
     })
+
+    if (previousType !== type) {
+      let actorGithubId: string | null = null
+      if (actor?.userId) {
+        const actorUser = await prisma.user.findUnique({
+          where: { id: actor.userId },
+          select: { githubId: true },
+        })
+        actorGithubId = actorUser?.githubId ?? null
+      }
+      await privacyEventsService.record({
+        type: 'PROFILE_TYPE_CHANGED',
+        subject: {
+          userId,
+          githubId: existing.user.githubId,
+          githubUsername: existing.user.githubUsername,
+        },
+        actor: actor
+          ? { userId: actor.userId, githubId: actorGithubId }
+          : undefined,
+        metadata: { from: previousType, to: type },
+      })
+    }
 
     return { userId, type }
   },

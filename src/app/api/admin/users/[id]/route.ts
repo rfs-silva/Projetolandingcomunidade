@@ -29,7 +29,9 @@ export async function PATCH(
       )
     }
 
-    const updated = await adminUsersService.updateType(userId, body.type)
+    const updated = await adminUsersService.updateType(userId, body.type, {
+      userId: adminId,
+    })
     return ok(updated)
   } catch (error) {
     return handleError(error)

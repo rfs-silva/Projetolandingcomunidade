@@ -64,6 +64,13 @@ enum ForumCategory {
   OFF_TOPIC
 }
 
+enum PrivacyEventType {
+  TERMS_ACCEPTED
+  DATA_EXPORTED
+  ACCOUNT_DELETED
+  PROFILE_TYPE_CHANGED
+}
+
 // ============================================================================
 // E1 - Auth & Users
 // ============================================================================
@@ -266,4 +273,25 @@ model ForumReply {
 
   @@index([threadId, createdAt])
   @@index([authorId])
+}
+
+// ============================================================================
+// LGPD - Registro de operações de tratamento (art. 37)
+// ============================================================================
+// Conserva subjectGithubId mesmo após exclusão da conta para fins de comprovação
+// junto à ANPD. Não tem FK para User para sobreviver à exclusão em cascade.
+
+model PrivacyEvent {
+  id               String           @id @default(uuid())
+  type             PrivacyEventType
+  subjectUserId    String?
+  subjectGithubId  String
+  subjectUsername  String
+  actorUserId      String?
+  actorGithubId    String?
+  metadata         Json?
+  createdAt        DateTime         @default(now())
+
+  @@index([subjectGithubId, createdAt])
+  @@index([type, createdAt])
 }
