@@ -85,6 +85,22 @@ export default async function ProfilePage() {
         </p>
         <TagsManager initialSelected={profile.tags} allTags={allTags} />
       </div>
+
+      <div className="mt-12 pt-8 border-t border-subtle">
+        <h2 className="text-xl font-semibold text-foreground">
+          Privacidade e dados
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1 mb-4">
+          Baixe seus dados em JSON, releia a política, ou exclua sua conta.
+          Tudo conforme LGPD.
+        </p>
+        <a
+          href="/dashboard/privacidade"
+          className="inline-flex items-center gap-2 text-sm text-primary-destaque hover:underline"
+        >
+          Gerenciar privacidade →
+        </a>
+      </div>
     </section>
   )
 }

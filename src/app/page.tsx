@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
+import { AccountDeletedBanner } from '@/components/AccountDeletedBanner'
 import Footer from '@/components/layout/Footer'
 import Header from '@/components/layout/Header'
 import About from '@/components/sections/About'
@@ -36,6 +38,9 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary selection:text-foreground overflow-x-hidden">
+      <Suspense fallback={null}>
+        <AccountDeletedBanner />
+      </Suspense>
       <Header />
       <main className="grow">
         <Hero />
