@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { optionalSafeHttpUrl } from '@/server/schemas/url'
 
 export const projectCategorySchema = z.enum([
   'Todos',
@@ -35,12 +36,8 @@ export const projectQuerySchema = z.object({
   category: projectCategorySchema.optional(),
 })
 
-const optionalUrl = z
-  .string()
-  .trim()
-  .url('URL inválida')
-  .optional()
-  .or(z.literal('').transform(() => undefined))
+// URL opcional restrita a http/https para evitar XSS via javascript:/data:.
+const optionalUrl = optionalSafeHttpUrl
 
 export const projectInputSchema = z.object({
   title: z

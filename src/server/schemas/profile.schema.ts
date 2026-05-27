@@ -26,7 +26,15 @@ const linkedinUrl = z
   .string()
   .trim()
   .url('Informe uma URL válida do LinkedIn')
-  .refine((u) => u.includes('linkedin.com'), 'URL precisa ser do LinkedIn')
+  .refine((raw) => {
+    try {
+      const u = new URL(raw)
+      if (u.protocol !== 'https:' && u.protocol !== 'http:') return false
+      return u.hostname === 'linkedin.com' || u.hostname.endsWith('.linkedin.com')
+    } catch {
+      return false
+    }
+  }, 'URL precisa ser do LinkedIn (https)')
   .optional()
   .or(z.literal('').transform(() => undefined))
 

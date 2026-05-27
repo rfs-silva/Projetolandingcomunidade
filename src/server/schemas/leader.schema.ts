@@ -1,12 +1,13 @@
 import { z } from 'zod'
+import { safeHttpUrl } from '@/server/schemas/url'
 
 export const leaderSchema = z.object({
   name: z.string().min(1),
   role: z.string().min(1),
   bio: z.string().min(1),
   githubUsername: z.string().nullable(),
-  linkedinUrl: z.string().url().nullable(),
-  avatarUrl: z.string().url().nullable(),
+  linkedinUrl: safeHttpUrl.nullable(),
+  avatarUrl: safeHttpUrl.nullable(),
 })
 
 export const leadersFileSchema = z.object({
