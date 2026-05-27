@@ -4,6 +4,7 @@ import { meDataService, DELETE_ACCOUNT_PHRASE } from '@/server/services/me-data.
 import { requireUserId } from '@/server/http/session'
 import { ok } from '@/server/http/response'
 import { handleError } from '@/server/http/errors'
+import { checkRateLimit } from '@/server/http/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,6 +14,9 @@ const deleteBodySchema = z.object({
 
 export async function DELETE(request: NextRequest) {
   try {
+    const limited = checkRateLimit(request, 'meSensitive')
+    if (limited) return limited
+
     const userId = await requireUserId()
     const body = deleteBodySchema.parse(await request.json())
     const result = await meDataService.deleteAccount(userId, body.confirmation)

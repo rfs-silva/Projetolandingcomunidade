@@ -4,6 +4,7 @@ import { mentorshipKindSchema } from '@/server/schemas/mentorship.schema'
 import { requireUserId } from '@/server/http/session'
 import { ok } from '@/server/http/response'
 import { handleError } from '@/server/http/errors'
+import { checkRateLimit } from '@/server/http/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,6 +28,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const limited = checkRateLimit(request, 'meSensitive')
+    if (limited) return limited
+
     const userId = await requireUserId()
     const body = await request.json()
     const application = await mentorshipService.apply(userId, body)
