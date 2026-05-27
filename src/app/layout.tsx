@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import '@/styles/globals.css'
 import { AuthProvider } from '@/components/providers/AuthProvider'
@@ -14,9 +14,25 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Comunidade Roraima Devs',
+  title: {
+    default: 'Comunidade Roraima Devs',
+    template: '%s · Comunidade Roraima',
+  },
   description:
     'Comunidade de desenvolvedores de Roraima. Mentoria, desafios, eventos e projetos.',
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  // Permite zoom até 5x (não trava em 1x — boa prática de acessibilidade)
+  maximumScale: 5,
+  // Cobre notch / safe areas em iOS quando rodar como PWA standalone
+  viewportFit: 'cover',
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+  ],
 }
 
 export default function RootLayout({
@@ -25,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

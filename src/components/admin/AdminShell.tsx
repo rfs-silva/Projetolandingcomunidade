@@ -66,7 +66,7 @@ export function AdminShell({
 
       <div className="mx-auto max-w-7xl px-6 py-8 grid grid-cols-1 md:grid-cols-[200px_1fr] gap-8">
         <nav className="md:sticky md:top-20 self-start">
-          <ul className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible">
+          <ul className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible hide-scrollbar">
             {NAV.map((item) => {
               const isActive =
                 item.href === '/admin'

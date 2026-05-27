@@ -266,3 +266,44 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/*
+ * Mobile-first defaults:
+ * - Em telas <768px, força inputs/textarea/select pra 16px.
+ *   iOS faz auto-zoom no focus quando font-size é menor — isso quebra UX
+ *   especialmente em forms longos. 16px é o limiar mágico.
+ * - Touch action: manipulation evita atraso de 300ms em mobile.
+ */
+@media (max-width: 767px) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+button,
+a {
+  touch-action: manipulation;
+}
+
+/* Esconde scrollbar mantendo o scroll funcional. Usado em navs horizontais
+ * que rolam em mobile (admin sidebar, filtros do Showcase, etc). */
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/*
+ * Safe area: respeita notch / barra inferior em iOS quando o app é instalado
+ * como PWA (display: standalone).
+ */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
