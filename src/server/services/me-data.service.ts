@@ -1,6 +1,8 @@
 import 'server-only'
 import { prisma } from '@/server/lib/prisma'
-import { NotFoundError } from '@/server/http/errors'
+import { AppError, NotFoundError } from '@/server/http/errors'
+
+export const DELETE_ACCOUNT_PHRASE = 'EXCLUIR MINHA CONTA'
 
 export type ExportPayload = {
   exportedAt: string
@@ -176,6 +178,52 @@ export const meDataService = {
         createdAt: r.createdAt.toISOString(),
         updatedAt: r.updatedAt.toISOString(),
       })),
+    }
+  },
+
+  /**
+   * Apaga a conta e todos os dados pessoais associados (cascade pelo schema).
+   * Exige a frase de confirmação literal para evitar exclusão acidental.
+   */
+  async deleteAccount(
+    userId: string,
+    confirmation: string,
+  ): Promise<{ deletedCounts: Record<string, number> }> {
+    if (confirmation.trim() !== DELETE_ACCOUNT_PHRASE) {
+      throw new AppError(
+        'CONFIRMATION_MISMATCH',
+        `Para confirmar, digite exatamente: ${DELETE_ACCOUNT_PHRASE}`,
+        400,
+      )
+    }
+
+    const existing = await prisma.user.findUnique({ where: { id: userId } })
+    if (!existing) throw new NotFoundError('Usuário')
+
+    // Cascade no schema apaga Profile, ProfileTag, UserProject, UserProjectTag,
+    // MentorshipApplication, ForumThread, ForumReply.
+    // Coletamos contadores antes para feedback.
+    const [
+      projectCount,
+      mentorshipCount,
+      threadCount,
+      replyCount,
+    ] = await Promise.all([
+      prisma.userProject.count({ where: { userId } }),
+      prisma.mentorshipApplication.count({ where: { userId } }),
+      prisma.forumThread.count({ where: { authorId: userId } }),
+      prisma.forumReply.count({ where: { authorId: userId } }),
+    ])
+
+    await prisma.user.delete({ where: { id: userId } })
+
+    return {
+      deletedCounts: {
+        projetos: projectCount,
+        candidaturasMentoria: mentorshipCount,
+        topicosForum: threadCount,
+        respostasForum: replyCount,
+      },
     }
   },
 
