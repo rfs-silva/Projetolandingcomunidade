@@ -1,12 +1,9 @@
+import '@/server/openapi/zod-ext'
 import { z } from 'zod'
 
-export const forumCategorySchema = z.enum([
-  'GERAL',
-  'ANUNCIOS',
-  'AJUDA',
-  'CARREIRA',
-  'OFF_TOPIC',
-])
+export const forumCategorySchema = z
+  .enum(['GERAL', 'ANUNCIOS', 'AJUDA', 'CARREIRA', 'OFF_TOPIC'])
+  .openapi('ForumCategory')
 
 export const FORUM_CATEGORY_LABELS: Record<
   z.infer<typeof forumCategorySchema>,
@@ -19,37 +16,45 @@ export const FORUM_CATEGORY_LABELS: Record<
   OFF_TOPIC: 'Off-topic',
 }
 
-export const threadAuthorSchema = z.object({
-  id: z.string().uuid(),
-  displayName: z.string(),
-  githubUsername: z.string(),
-  avatarUrl: z.string().nullable(),
-})
+export const threadAuthorSchema = z
+  .object({
+    id: z.string().uuid(),
+    displayName: z.string(),
+    githubUsername: z.string(),
+    avatarUrl: z.string().nullable(),
+  })
+  .openapi('ThreadAuthor')
 
-export const threadSummarySchema = z.object({
-  id: z.string().uuid(),
-  title: z.string(),
-  category: forumCategorySchema,
-  isPinned: z.boolean(),
-  isLocked: z.boolean(),
-  repliesCount: z.number().int(),
-  lastReplyAt: z.date().nullable(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  author: threadAuthorSchema,
-})
+export const threadSummarySchema = z
+  .object({
+    id: z.string().uuid(),
+    title: z.string(),
+    category: forumCategorySchema,
+    isPinned: z.boolean(),
+    isLocked: z.boolean(),
+    repliesCount: z.number().int(),
+    lastReplyAt: z.date().nullable(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
+    author: threadAuthorSchema,
+  })
+  .openapi('ThreadSummary')
 
-export const threadDetailSchema = threadSummarySchema.extend({
-  body: z.string(),
-})
+export const threadDetailSchema = threadSummarySchema
+  .extend({
+    body: z.string(),
+  })
+  .openapi('ThreadDetail')
 
-export const replySchema = z.object({
-  id: z.string().uuid(),
-  body: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  author: threadAuthorSchema,
-})
+export const replySchema = z
+  .object({
+    id: z.string().uuid(),
+    body: z.string(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
+    author: threadAuthorSchema,
+  })
+  .openapi('Reply')
 
 export const threadInputSchema = z.object({
   title: z

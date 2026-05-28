@@ -1,26 +1,31 @@
+import '@/server/openapi/zod-ext'
 import { z } from 'zod'
 
-export const profileTypeSchema = z.enum(['MEMBER', 'COMPANY', 'LEADER', 'FOUNDER'])
+export const profileTypeSchema = z
+  .enum(['MEMBER', 'COMPANY', 'LEADER', 'FOUNDER'])
+  .openapi('ProfileType')
 
 // No onboarding self-service permitimos apenas MEMBER ou COMPANY.
 // LEADER/FOUNDER exigem promoção manual (admin).
 export const selfServiceProfileTypeSchema = z.enum(['MEMBER', 'COMPANY'])
 
-export const profileSchema = z.object({
-  id: z.string().uuid(),
-  displayName: z.string(),
-  bio: z.string().nullable(),
-  linkedinUrl: z.string().nullable(),
-  type: profileTypeSchema,
-  location: z.string().nullable(),
-  tags: z.array(
-    z.object({
-      id: z.string().uuid(),
-      slug: z.string(),
-      label: z.string(),
-    }),
-  ),
-})
+export const profileSchema = z
+  .object({
+    id: z.string().uuid(),
+    displayName: z.string().openapi({ example: 'Raimundo Silva' }),
+    bio: z.string().nullable(),
+    linkedinUrl: z.string().nullable(),
+    type: profileTypeSchema,
+    location: z.string().nullable().openapi({ example: 'Boa Vista, RR' }),
+    tags: z.array(
+      z.object({
+        id: z.string().uuid(),
+        slug: z.string(),
+        label: z.string(),
+      }),
+    ),
+  })
+  .openapi('Profile')
 
 const linkedinUrl = z
   .string()
