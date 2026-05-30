@@ -9,6 +9,7 @@ import {
   Shield,
   Sparkles,
   Target,
+  TrendingUp,
   Users,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -162,6 +163,12 @@ export default async function DashboardPage() {
           icon={<MessageSquare size={20} />}
           title="Fórum"
           desc="Discussões, dúvidas e anúncios da comunidade."
+        />
+        <ActiveCard
+          href="/dashboard/evolucao"
+          icon={<TrendingUp size={20} />}
+          title="Minha evolução"
+          desc="Pontos, desafios concluídos, eventos e ranking."
         />
       </div>
 
