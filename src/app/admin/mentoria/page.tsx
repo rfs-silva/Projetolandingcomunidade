@@ -1,5 +1,14 @@
 import Link from 'next/link'
-import { Handshake, Sparkles } from 'lucide-react'
+import {
+  CheckCircle2,
+  Clock,
+  Handshake,
+  Send,
+  Sparkles,
+  UserCheck,
+  Users,
+  XCircle,
+} from 'lucide-react'
 import { requireAdminSession } from '@/server/lib/admin-session'
 import { mentorshipService } from '@/server/services/mentorship.service'
 import {
@@ -64,10 +73,15 @@ export default async function AdminMentorshipPage({
   const activeStatus = statusParsed.success ? statusParsed.data : undefined
   const activeKind = kindParsed.success ? kindParsed.data : undefined
 
-  const applications = await mentorshipService.listAdmin({
-    status: activeStatus,
-    kind: activeKind,
-  })
+  const [applications, stats] = await Promise.all([
+    mentorshipService.listAdmin({
+      status: activeStatus,
+      kind: activeKind,
+    }),
+    mentorshipService.adminStats(),
+  ])
+
+  const pairable = Math.min(stats.acceptedMentors, stats.acceptedMentees)
 
   function filterHref(key: 'status' | 'kind', value: string) {
     const next = new URLSearchParams()
@@ -99,6 +113,55 @@ export default async function AdminMentorshipPage({
           </div>
         </div>
       </header>
+
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Stat
+          icon={<Users size={16} />}
+          label="Total"
+          value={stats.total}
+        />
+        <Stat
+          icon={<Send size={16} />}
+          label="Pendentes"
+          value={stats.byStatus.SUBMITTED}
+          tone={stats.byStatus.SUBMITTED > 0 ? 'warn' : 'default'}
+        />
+        <Stat
+          icon={<Clock size={16} />}
+          label="Em análise"
+          value={stats.byStatus.IN_REVIEW}
+        />
+        <Stat
+          icon={<CheckCircle2 size={16} />}
+          label="Aceitas"
+          value={stats.byStatus.ACCEPTED}
+          tone="success"
+        />
+      </section>
+
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Stat
+          icon={<Sparkles size={16} />}
+          label="Mentores aceitos"
+          value={stats.acceptedMentors}
+        />
+        <Stat
+          icon={<Sparkles size={16} />}
+          label="Mentorados aceitos"
+          value={stats.acceptedMentees}
+        />
+        <Stat
+          icon={<UserCheck size={16} />}
+          label="Pareamentos possíveis"
+          value={pairable}
+          tone={pairable > 0 ? 'success' : 'default'}
+        />
+        <Stat
+          icon={<XCircle size={16} />}
+          label="Recusadas"
+          value={stats.byStatus.REJECTED}
+        />
+      </section>
 
       <div className="flex flex-col gap-3 border-b border-subtle pb-4">
         <FilterRow
@@ -192,6 +255,34 @@ export default async function AdminMentorshipPage({
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+function Stat({
+  icon,
+  label,
+  value,
+  tone = 'default',
+}: {
+  icon: React.ReactNode
+  label: string
+  value: number
+  tone?: 'default' | 'warn' | 'success'
+}) {
+  const klass =
+    tone === 'success'
+      ? 'border-emerald-500/40 bg-emerald-500/10'
+      : tone === 'warn'
+        ? 'border-amber-500/40 bg-amber-500/10'
+        : 'border-subtle bg-card'
+  return (
+    <div className={'rounded-xl border p-4 ' + klass}>
+      <div className="flex items-center gap-2 text-muted-foreground text-xs">
+        {icon}
+        <span>{label}</span>
+      </div>
+      <div className="mt-2 text-2xl font-semibold text-foreground">{value}</div>
     </div>
   )
 }

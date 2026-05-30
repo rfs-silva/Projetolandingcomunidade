@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Lock, Pencil, Plus, Target } from 'lucide-react'
+import { Lock, Pencil, Plus, Target, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { requireAdminSession } from '@/server/lib/admin-session'
 import { adminChallengesService } from '@/server/services/admin-challenges.service'
@@ -114,6 +114,17 @@ export default async function AdminChallengesPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2 justify-end">
+                      <Link href={`/admin/desafios/${c.id}/participacoes`}>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          icon={<Users size={14} />}
+                          iconPosition="left"
+                        >
+                          Participações
+                        </Button>
+                      </Link>
                       <Link href={`/admin/desafios/${c.id}/editar`}>
                         <Button
                           type="button"

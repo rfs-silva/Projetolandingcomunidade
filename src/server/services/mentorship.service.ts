@@ -125,4 +125,39 @@ export const mentorshipService = {
     })
     return mentorshipApplicationSchema.parse(updated)
   },
+
+  async adminStats(): Promise<{
+    total: number
+    byStatus: Record<ApplicationStatus, number>
+    byKind: Record<MentorshipKind, number>
+    acceptedMentors: number
+    acceptedMentees: number
+  }> {
+    const grouped = await prisma.mentorshipApplication.groupBy({
+      by: ['status', 'kind'],
+      _count: { _all: true },
+    })
+
+    const byStatus: Record<ApplicationStatus, number> = {
+      SUBMITTED: 0,
+      IN_REVIEW: 0,
+      ACCEPTED: 0,
+      REJECTED: 0,
+    }
+    const byKind: Record<MentorshipKind, number> = { MENTOR: 0, MENTEE: 0 }
+    let total = 0
+    let acceptedMentors = 0
+    let acceptedMentees = 0
+    for (const g of grouped) {
+      const c = g._count._all
+      total += c
+      byStatus[g.status as ApplicationStatus] += c
+      byKind[g.kind as MentorshipKind] += c
+      if (g.status === 'ACCEPTED') {
+        if (g.kind === 'MENTOR') acceptedMentors += c
+        if (g.kind === 'MENTEE') acceptedMentees += c
+      }
+    }
+    return { total, byStatus, byKind, acceptedMentors, acceptedMentees }
+  },
 }

@@ -181,4 +181,62 @@ export const adminProgressService = {
   async countPendingSubmissions(): Promise<number> {
     return prisma.challengeParticipation.count({ where: { status: 'SUBMITTED' } })
   },
+
+  async listChallengeParticipations(challengeNumber: string): Promise<
+    Array<{
+      id: string
+      status: 'IN_PROGRESS' | 'SUBMITTED' | 'APPROVED' | 'REJECTED'
+      submissionUrl: string | null
+      submissionNote: string | null
+      reviewerNote: string | null
+      startedAt: Date
+      submittedAt: Date | null
+      reviewedAt: Date | null
+      user: {
+        id: string
+        displayName: string
+        githubUsername: string
+        avatarUrl: string | null
+      }
+    }>
+  > {
+    const norm = challengeNumber.startsWith('#')
+      ? challengeNumber
+      : `#${challengeNumber.padStart(2, '0')}`
+    const challenge = await prisma.challenge.findUnique({
+      where: { number: norm },
+    })
+    if (!challenge) throw new NotFoundError('Desafio')
+
+    const rows = await prisma.challengeParticipation.findMany({
+      where: { challengeId: challenge.id },
+      include: {
+        user: {
+          select: {
+            id: true,
+            githubUsername: true,
+            avatarUrl: true,
+            profile: { select: { displayName: true } },
+          },
+        },
+      },
+      orderBy: { startedAt: 'asc' },
+    })
+    return rows.map((r) => ({
+      id: r.id,
+      status: r.status,
+      submissionUrl: r.submissionUrl,
+      submissionNote: r.submissionNote,
+      reviewerNote: r.reviewerNote,
+      startedAt: r.startedAt,
+      submittedAt: r.submittedAt,
+      reviewedAt: r.reviewedAt,
+      user: {
+        id: r.user.id,
+        displayName: r.user.profile?.displayName ?? r.user.githubUsername,
+        githubUsername: r.user.githubUsername,
+        avatarUrl: r.user.avatarUrl,
+      },
+    }))
+  },
 }
