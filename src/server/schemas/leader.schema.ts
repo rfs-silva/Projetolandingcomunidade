@@ -10,8 +10,4 @@ export const leaderSchema = z.object({
   avatarUrl: safeHttpUrl.nullable(),
 })
 
-export const leadersFileSchema = z.object({
-  leaders: z.array(leaderSchema),
-})
-
 export type LeaderDto = z.infer<typeof leaderSchema>

@@ -219,6 +219,8 @@ type SeedUser = {
     linkedinUrl: string | null
     location: string
     tagSlugs: string[]
+    featuredAsLeader?: boolean
+    leaderRole?: string
   }
   project?: SeedProject
 }
@@ -298,6 +300,8 @@ const SEED_USERS: SeedUser[] = [
       linkedinUrl: 'https://www.linkedin.com/in/pedro-mendes-demo',
       location: 'Boa Vista, RR',
       tagSlugs: ['react', 'next-js', 'node', 'typescript', 'lideranca', 'mentoria'],
+      featuredAsLeader: true,
+      leaderRole: 'Liderança técnica',
     },
   },
   {
@@ -414,6 +418,8 @@ async function main() {
       bio: seed.profile.bio,
       linkedinUrl: seed.profile.linkedinUrl,
       location: seed.profile.location,
+      featuredAsLeader: seed.profile.featuredAsLeader ?? false,
+      leaderRole: seed.profile.leaderRole ?? null,
     }
 
     const profile = await prisma.profile.upsert({

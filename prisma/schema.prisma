@@ -108,19 +108,22 @@ model User {
 }
 
 model Profile {
-  id          String       @id @default(uuid())
-  userId      String       @unique
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  displayName String
-  bio         String?
-  linkedinUrl String?
-  type        ProfileType  @default(MEMBER)
-  location    String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  tags        ProfileTag[]
+  id               String       @id @default(uuid())
+  userId           String       @unique
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName      String
+  bio              String?
+  linkedinUrl      String?
+  type             ProfileType  @default(MEMBER)
+  location         String?
+  featuredAsLeader Boolean      @default(false)
+  leaderRole       String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  tags             ProfileTag[]
 
   @@index([type])
+  @@index([featuredAsLeader])
 }
 
 // ============================================================================

@@ -9,6 +9,7 @@ import {
 import { UserAvatar } from '@/components/ui/UserAvatar'
 import { cn } from '@/lib/utils'
 import { TypeSelect } from './TypeSelect'
+import { FeaturedLeaderToggle } from './FeaturedLeaderToggle'
 
 export const metadata = {
   title: 'Admin · Usuários',
@@ -100,6 +101,7 @@ export default async function AdminUsersPage({
               <th className="px-4 py-3 hidden md:table-cell">Localização</th>
               <th className="px-4 py-3 hidden md:table-cell">Entrou em</th>
               <th className="px-4 py-3">Papel atual</th>
+              <th className="px-4 py-3">Landing</th>
               <th className="px-4 py-3">Ações</th>
             </tr>
           </thead>
@@ -140,6 +142,13 @@ export default async function AdminUsersPage({
                   <span className="text-xs">
                     {TYPE_LABEL[u.type]}
                   </span>
+                </td>
+                <td className="px-4 py-3">
+                  <FeaturedLeaderToggle
+                    userId={u.userId}
+                    initialFeatured={u.featuredAsLeader}
+                    initialRole={u.leaderRole}
+                  />
                 </td>
                 <td className="px-4 py-3">
                   <TypeSelect

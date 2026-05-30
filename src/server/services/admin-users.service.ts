@@ -17,6 +17,8 @@ export type AdminUserRow = {
   type: ProfileType
   location: string | null
   joinedAt: Date
+  featuredAsLeader: boolean
+  leaderRole: string | null
 }
 
 export const adminUsersService = {
@@ -43,7 +45,38 @@ export const adminUsersService = {
       type: profileTypeSchema.parse(row.type),
       location: row.location,
       joinedAt: row.user.createdAt,
+      featuredAsLeader: row.featuredAsLeader,
+      leaderRole: row.leaderRole,
     }))
+  },
+
+  async updateFeaturedLeader(
+    userId: string,
+    input: { featured: boolean; role?: string | null },
+  ): Promise<{
+    userId: string
+    featuredAsLeader: boolean
+    leaderRole: string | null
+  }> {
+    const existing = await prisma.profile.findUnique({ where: { userId } })
+    if (!existing) throw new NotFoundError('Perfil')
+
+    const trimmed = (input.role ?? '').trim()
+    const role = input.featured ? (trimmed.length > 0 ? trimmed : null) : null
+
+    const updated = await prisma.profile.update({
+      where: { userId },
+      data: {
+        featuredAsLeader: input.featured,
+        leaderRole: role,
+      },
+    })
+
+    return {
+      userId: updated.userId,
+      featuredAsLeader: updated.featuredAsLeader,
+      leaderRole: updated.leaderRole,
+    }
   },
 
   async updateType(

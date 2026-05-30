@@ -1,17 +1,43 @@
 import 'server-only'
-import { readFile } from 'node:fs/promises'
-import path from 'node:path'
+import { prisma } from '@/server/lib/prisma'
 import {
-  leadersFileSchema,
+  leaderSchema,
   type LeaderDto,
 } from '@/server/schemas/leader.schema'
 
-const FILE_PATH = path.join(process.cwd(), 'content', 'leaders.json')
+const TYPE_FALLBACK_ROLE: Record<string, string> = {
+  FOUNDER: 'Fundador',
+  LEADER: 'Liderança',
+  COMPANY: 'Empresa parceira',
+  MEMBER: 'Membro',
+}
 
 export const leadersService = {
+  /**
+   * Lideranças públicas exibidas na landing. Persistido no banco via
+   * Profile.featuredAsLeader; o cargo exibido vem de Profile.leaderRole
+   * (fallback para o ProfileType quando vazio).
+   */
   async list(): Promise<LeaderDto[]> {
-    const raw = await readFile(FILE_PATH, 'utf-8')
-    const parsed = leadersFileSchema.parse(JSON.parse(raw))
-    return parsed.leaders
+    const profiles = await prisma.profile.findMany({
+      where: { featuredAsLeader: true },
+      include: {
+        user: {
+          select: { githubUsername: true, avatarUrl: true },
+        },
+      },
+      orderBy: [{ type: 'asc' }, { displayName: 'asc' }],
+    })
+
+    return profiles.map((p) =>
+      leaderSchema.parse({
+        name: p.displayName,
+        role: p.leaderRole ?? TYPE_FALLBACK_ROLE[p.type] ?? 'Liderança',
+        bio: p.bio ?? 'Membro destacado da comunidade.',
+        githubUsername: p.user.githubUsername,
+        linkedinUrl: p.linkedinUrl,
+        avatarUrl: p.user.avatarUrl,
+      }),
+    )
   },
 }
