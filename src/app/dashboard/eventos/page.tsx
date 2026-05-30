@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { ArrowLeft, Calendar, Lock, Monitor, Users } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { requireDashboardSession } from '@/server/lib/dashboard-session'
 import { eventsService } from '@/server/services/events.service'
+import { progressService } from '@/server/services/progress.service'
 import { cn } from '@/lib/utils'
+import { EventRegistrationButton } from '@/components/dashboard/EventRegistrationButton'
 
 export const metadata = {
   title: 'Eventos · Comunidade Roraima',
@@ -12,9 +13,14 @@ export const metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function EventsDashboardPage() {
-  await requireDashboardSession('/dashboard/eventos')
+  const { userId } = await requireDashboardSession('/dashboard/eventos')
 
-  const eventsAll = await eventsService.list({}, { includeMembers: true })
+  const [eventsAll, myRegs] = await Promise.all([
+    eventsService.list({}, { includeMembers: true }),
+    progressService.listMyEvents(userId),
+  ])
+
+  const regByNumber = new Map(myRegs.map((r) => [r.eventNumber, r.status]))
 
   const sorted = [...eventsAll].sort((a, b) => {
     const av = a.visibility === 'MEMBERS' ? 0 : 1
@@ -86,14 +92,12 @@ export default async function EventsDashboardPage() {
                     {event.type}
                   </span>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline-primary"
-                  size="sm"
-                  className="mt-auto w-full"
-                >
-                  Inscrever-se
-                </Button>
+                <div className="mt-auto">
+                  <EventRegistrationButton
+                    eventNumber={event.number}
+                    initialStatus={regByNumber.get(event.number) ?? 'NONE'}
+                  />
+                </div>
               </article>
             )
           })}

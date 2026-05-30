@@ -1,10 +1,11 @@
 import Link from 'next/link'
-import { ArrowLeft, ArrowRight, Layers, Lock, Monitor } from 'lucide-react'
+import { ArrowLeft, Layers, Lock, Monitor } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { requireDashboardSession } from '@/server/lib/dashboard-session'
 import { challengesService } from '@/server/services/challenges.service'
+import { progressService } from '@/server/services/progress.service'
 import { cn } from '@/lib/utils'
+import { ChallengeActionButton } from '@/components/dashboard/ChallengeActionButton'
 
 export const metadata = {
   title: 'Desafios · Comunidade Roraima',
@@ -15,9 +16,19 @@ export const dynamic = 'force-dynamic'
 const ICONS: Record<string, LucideIcon> = { Monitor, Layers }
 
 export default async function ChallengesDashboardPage() {
-  await requireDashboardSession('/dashboard/desafios')
+  const { userId } = await requireDashboardSession('/dashboard/desafios')
 
-  const all = await challengesService.list({ includeMembers: true })
+  const [all, myParts] = await Promise.all([
+    challengesService.list({ includeMembers: true }),
+    progressService.listMyChallenges(userId),
+  ])
+
+  const partByNumber = new Map(
+    myParts.map((p) => [
+      p.challengeNumber,
+      { status: p.status, reviewerNote: p.reviewerNote },
+    ]),
+  )
 
   const sorted = [...all].sort((a, b) => {
     const av = a.visibility === 'MEMBERS' ? 0 : 1
@@ -95,16 +106,15 @@ export default async function ChallengesDashboardPage() {
                   {c.description}
                 </p>
 
-                <Button
-                  type="button"
-                  variant="outline-primary"
-                  size="sm"
-                  icon={<ArrowRight size={14} />}
-                  iconPosition="right"
-                  className="mt-auto w-full"
-                >
-                  Ver desafio
-                </Button>
+                <div className="mt-auto">
+                  <ChallengeActionButton
+                    challengeNumber={c.number}
+                    initialStatus={partByNumber.get(c.number)?.status ?? 'NONE'}
+                    initialReviewerNote={
+                      partByNumber.get(c.number)?.reviewerNote ?? null
+                    }
+                  />
+                </div>
               </article>
             )
           })}
