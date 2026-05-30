@@ -1,11 +1,12 @@
 import Link from 'next/link'
 import {
   ArrowLeft,
-  Award,
   Calendar,
   CheckCircle2,
   Clock,
+  Flame,
   Send,
+  Sparkles,
   Target,
   Trophy,
   XCircle,
@@ -13,6 +14,37 @@ import {
 import { requireDashboardSession } from '@/server/lib/dashboard-session'
 import { progressService } from '@/server/services/progress.service'
 import { UserAvatar } from '@/components/ui/UserAvatar'
+
+type Level = {
+  name: string
+  min: number
+  max: number | null
+}
+
+const LEVELS: Level[] = [
+  { name: 'Iniciante', min: 0, max: 50 },
+  { name: 'Praticante', min: 50, max: 200 },
+  { name: 'Contribuidor', min: 200, max: 500 },
+  { name: 'Veterano', min: 500, max: 1000 },
+  { name: 'Lenda', min: 1000, max: null },
+]
+
+function getLevel(points: number) {
+  const idx = LEVELS.findIndex(
+    (l) => points >= l.min && (l.max === null || points < l.max),
+  )
+  const safeIdx = idx === -1 ? LEVELS.length - 1 : idx
+  const current = LEVELS[safeIdx]
+  const next = LEVELS[safeIdx + 1] ?? null
+  const toNext = next ? Math.max(next.min - points, 0) : 0
+  const progress = next
+    ? Math.min(
+        100,
+        Math.round(((points - current.min) / (next.min - current.min)) * 100),
+      )
+    : 100
+  return { current, next, toNext, progress }
+}
 
 export const metadata = {
   title: 'Minha evolução · Comunidade Roraima',
@@ -51,6 +83,13 @@ export default async function EvolucaoPage() {
   ])
 
   const myRank = ranking.find((r) => r.userId === userId)?.rank ?? null
+  const level = getLevel(stats.points)
+  const challengePoints = challenges
+    .filter((c) => c.status === 'APPROVED')
+    .reduce((sum, c) => sum + c.points, 0)
+  const eventPoints = events
+    .filter((e) => e.status === 'ATTENDED')
+    .reduce((sum, e) => sum + e.points, 0)
 
   return (
     <section className="mx-auto max-w-7xl px-6 py-10">
@@ -61,73 +100,123 @@ export default async function EvolucaoPage() {
         <ArrowLeft size={14} /> Voltar para o painel
       </Link>
 
-      <div className="flex items-center gap-4">
-        <UserAvatar
-          size="lg"
-          src={image}
-          name={profile.displayName}
-          seed={githubUsername}
-        />
-        <div>
-          <h1 className="text-3xl font-semibold text-foreground">
-            Minha evolução
-          </h1>
-          <p className="mt-1 text-muted-foreground text-sm">
-            Acompanhe seus desafios, eventos e pontos na comunidade.
-          </p>
+      {/* Hero: identidade + pontos + nivel + progresso */}
+      <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card p-6 md:p-8">
+        <div className="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+        <div className="absolute -left-16 bottom-0 w-40 h-40 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+
+        <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="flex items-center gap-4 min-w-0">
+            <UserAvatar
+              size="lg"
+              src={image}
+              name={profile.displayName}
+              seed={githubUsername}
+            />
+            <div className="min-w-0">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                Minha evolução
+              </p>
+              <h1 className="text-2xl md:text-3xl font-semibold text-foreground truncate">
+                {profile.displayName}
+              </h1>
+              <div className="mt-2 inline-flex items-center gap-1.5 text-xs uppercase tracking-wider text-primary-destaque bg-primary/10 border border-primary/30 px-2 py-1 rounded-full">
+                <Sparkles size={12} /> {level.current.name}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-end gap-6 md:gap-8 flex-wrap">
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Pontos
+              </span>
+              <span className="text-4xl md:text-5xl font-bold text-foreground leading-none">
+                {stats.points}
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Ranking
+              </span>
+              <span className="text-4xl md:text-5xl font-bold text-primary-destaque leading-none">
+                {myRank ? `#${myRank}` : '—'}
+              </span>
+            </div>
+          </div>
         </div>
+
+        {level.next ? (
+          <div className="relative mt-6">
+            <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+              <span>
+                Nível {level.current.name} ·{' '}
+                <span className="text-foreground font-medium">
+                  {level.progress}%
+                </span>
+              </span>
+              <span>
+                Faltam{' '}
+                <span className="text-foreground font-medium">
+                  {level.toNext} pts
+                </span>{' '}
+                para {level.next.name}
+              </span>
+            </div>
+            <div className="h-2 rounded-full bg-background-secondary border border-border overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-primary to-primary-destaque transition-all"
+                style={{ width: `${level.progress}%` }}
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="relative mt-6 inline-flex items-center gap-2 text-sm text-primary-destaque">
+            <Flame size={14} /> Nível máximo atingido — você é{' '}
+            <strong>{level.current.name}</strong> 🎉
+          </div>
+        )}
       </div>
 
-      <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          icon={<Award size={18} />}
-          label="Pontos"
-          value={stats.points}
-          accent
-        />
-        <StatCard
-          icon={<Trophy size={18} />}
-          label="Ranking"
-          value={myRank ? `#${myRank}` : '—'}
-        />
-        <StatCard
+      {/* Cards de atividade: desafios, eventos, pendencias */}
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <ActivityCard
           icon={<Target size={18} />}
-          label="Desafios aprovados"
-          value={stats.challengesApproved}
+          title="Desafios"
+          big={stats.challengesApproved}
+          bigLabel="aprovados"
+          points={challengePoints}
+          rows={[
+            { label: 'Em análise', value: stats.challengesSubmitted },
+            { label: 'Em andamento', value: stats.challengesInProgress },
+          ]}
         />
-        <StatCard
+        <ActivityCard
           icon={<Calendar size={18} />}
-          label="Eventos com presença"
-          value={stats.eventsAttended}
+          title="Eventos"
+          big={stats.eventsAttended}
+          bigLabel="com presença"
+          points={eventPoints}
+          rows={[
+            { label: 'Inscrito', value: stats.eventsRegistered },
+            { label: 'Total inscrições', value: events.length },
+          ]}
         />
-      </div>
-
-      <div className="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <MiniStat
-          icon={<Clock size={14} />}
-          label="Desafios em andamento"
-          value={stats.challengesInProgress}
-        />
-        <MiniStat
-          icon={<Send size={14} />}
-          label="Submissões em análise"
-          value={stats.challengesSubmitted}
-        />
-        <MiniStat
-          icon={<Calendar size={14} />}
-          label="Eventos inscritos"
-          value={stats.eventsRegistered}
-        />
-        <MiniStat
-          icon={<CheckCircle2 size={14} />}
-          label="Total participações"
-          value={
+        <ActivityCard
+          icon={<Trophy size={18} />}
+          title="Resumo"
+          big={
             stats.challengesApproved +
             stats.challengesInProgress +
             stats.challengesSubmitted +
             stats.eventsAttended +
             stats.eventsRegistered
           }
+          bigLabel="participações"
+          rows={[
+            { label: 'Pontos por desafios', value: challengePoints },
+            { label: 'Pontos por eventos', value: eventPoints },
+          ]}
         />
       </div>
 
@@ -300,67 +389,53 @@ export default async function EvolucaoPage() {
   )
 }
 
-function StatCard({
+function ActivityCard({
   icon,
-  label,
-  value,
-  accent,
+  title,
+  big,
+  bigLabel,
+  points,
+  rows,
 }: {
   icon: React.ReactNode
-  label: string
-  value: string | number
-  accent?: boolean
+  title: string
+  big: number
+  bigLabel: string
+  points?: number
+  rows: { label: string; value: number }[]
 }) {
   return (
-    <div
-      className={
-        'rounded-xl border p-4 flex items-center gap-4 ' +
-        (accent
-          ? 'border-primary/30 bg-primary/5'
-          : 'border-border bg-card')
-      }
-    >
-      <div
-        className={
-          'w-10 h-10 rounded-lg flex items-center justify-center ' +
-          (accent
-            ? 'bg-primary/10 border border-primary/30 text-primary-destaque'
-            : 'bg-background-secondary text-muted-foreground border border-zinc-700/50')
-        }
-      >
-        {icon}
-      </div>
-      <div className="min-w-0">
-        <div className="text-2xl font-semibold text-foreground leading-none">
-          {value}
+    <div className="rounded-2xl border border-border bg-card p-5 flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-foreground">
+          <span className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/30 text-primary-destaque flex items-center justify-center">
+            {icon}
+          </span>
+          <span className="text-sm font-medium">{title}</span>
         </div>
-        <div className="mt-1 text-xs uppercase tracking-wider text-muted-foreground truncate">
-          {label}
-        </div>
+        {typeof points === 'number' ? (
+          <span className="text-[10px] uppercase tracking-wider text-primary-destaque bg-primary/5 border border-primary/20 px-2 py-0.5 rounded">
+            +{points} pts
+          </span>
+        ) : null}
       </div>
-    </div>
-  )
-}
 
-function MiniStat({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode
-  label: string
-  value: number
-}) {
-  return (
-    <div className="rounded-xl border border-border bg-card p-3 flex items-center gap-3">
-      <span className="text-muted-foreground">{icon}</span>
-      <div className="min-w-0">
-        <div className="text-base font-semibold text-foreground leading-none">
-          {value}
-        </div>
-        <div className="mt-1 text-[10px] uppercase tracking-wider text-muted-foreground truncate">
-          {label}
-        </div>
+      <div className="flex items-baseline gap-2">
+        <span className="text-4xl font-bold text-foreground leading-none">
+          {big}
+        </span>
+        <span className="text-xs text-muted-foreground">{bigLabel}</span>
+      </div>
+
+      <div className="border-t border-border/60 pt-3 flex flex-col gap-2">
+        {rows.map((row) => (
+          <div key={row.label} className="flex items-center justify-between">
+            <span className="text-xs text-muted-foreground">{row.label}</span>
+            <span className="text-sm font-medium text-foreground">
+              {row.value}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   )
