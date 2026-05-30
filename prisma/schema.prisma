@@ -1,4 +1,4 @@
-// Schema do MVP - Comunidade Roraima Devs
+// Schema do MVP - Comunidade Roraima Fullstack Developers
 // Cobre: users, profiles, tags, events, challenges, projects, mentorship.
 // Tabelas anotadas com [E1..E7] indicam o epico que primeiro as consome.
 
@@ -71,6 +71,19 @@ enum PrivacyEventType {
   PROFILE_TYPE_CHANGED
 }
 
+enum ChallengeParticipationStatus {
+  IN_PROGRESS
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum EventRegistrationStatus {
+  REGISTERED
+  ATTENDED
+  CANCELLED
+}
+
 // ============================================================================
 // E1 - Auth & Users
 // ============================================================================
@@ -90,6 +103,8 @@ model User {
   projects               UserProject[]
   forumThreads           ForumThread[]
   forumReplies           ForumReply[]
+  challengeParticipations ChallengeParticipation[]
+  eventRegistrations     EventRegistration[]
 }
 
 model Profile {
@@ -145,10 +160,12 @@ model Event {
   dateFull    String
   dateShort   String
   type        EventType
-  visibility  Visibility @default(PUBLIC)
+  visibility  Visibility          @default(PUBLIC)
   imageIndex  Int
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  points      Int                 @default(10)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  registrations EventRegistration[]
 
   @@index([visibility])
   @@index([type])
@@ -159,15 +176,17 @@ model Event {
 // ============================================================================
 
 model Challenge {
-  id          String         @id @default(uuid())
-  number      String         @unique
-  title       String
-  description String
-  imageIndex  Int
-  visibility  Visibility     @default(PUBLIC)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  tags        ChallengeTag[]
+  id            String                    @id @default(uuid())
+  number        String                    @unique
+  title         String
+  description   String
+  imageIndex    Int
+  visibility    Visibility                @default(PUBLIC)
+  points        Int                       @default(20)
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
+  tags          ChallengeTag[]
+  participations ChallengeParticipation[]
 
   @@index([visibility])
 }
@@ -294,4 +313,47 @@ model PrivacyEvent {
 
   @@index([subjectGithubId, createdAt])
   @@index([type, createdAt])
+}
+
+// ============================================================================
+// Gamificação - participação em desafios e eventos
+// ============================================================================
+
+model ChallengeParticipation {
+  id             String                       @id @default(uuid())
+  userId         String
+  user           User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challengeId    String
+  challenge      Challenge                    @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  status         ChallengeParticipationStatus @default(IN_PROGRESS)
+  submissionUrl  String?
+  submissionNote String?
+  reviewerNote   String?
+  startedAt      DateTime                     @default(now())
+  submittedAt    DateTime?
+  reviewedAt     DateTime?
+  createdAt      DateTime                     @default(now())
+  updatedAt      DateTime                     @updatedAt
+
+  @@unique([userId, challengeId])
+  @@index([status])
+  @@index([challengeId, status])
+}
+
+model EventRegistration {
+  id           String                  @id @default(uuid())
+  userId       String
+  user         User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId      String
+  event        Event                   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  status       EventRegistrationStatus @default(REGISTERED)
+  registeredAt DateTime                @default(now())
+  attendedAt   DateTime?
+  cancelledAt  DateTime?
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+
+  @@unique([userId, eventId])
+  @@index([status])
+  @@index([eventId, status])
 }
