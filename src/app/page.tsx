@@ -9,14 +9,16 @@ import Events from '@/components/sections/Events'
 import Hero from '@/components/sections/Hero'
 import Leaders from '@/components/sections/Leaders'
 import Mentorship from '@/components/sections/Mentorship'
+import Ranking from '@/components/sections/Ranking'
 import Showcase from '@/components/sections/Showcase'
 import { eventsService } from '@/server/services/events.service'
 import { challengesService } from '@/server/services/challenges.service'
 import { projectsService } from '@/server/services/projects.service'
 import { leadersService } from '@/server/services/leaders.service'
+import { progressService } from '@/server/services/progress.service'
 
 export const metadata: Metadata = {
-  title: 'Comunidade Roraima Devs',
+  title: 'Comunidade Roraima Fullstack Developers',
   description:
     'Comunidade de desenvolvedores em Roraima. Networking, eventos, desafios e mentoria para crescer na carreira tech.',
   keywords:
@@ -28,11 +30,12 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function Home() {
-  const [events, challenges, projects, leaders] = await Promise.all([
+  const [events, challenges, projects, leaders, ranking] = await Promise.all([
     eventsService.list({}),
     challengesService.list(),
     projectsService.list({}),
     leadersService.list(),
+    progressService.ranking(3),
   ])
   const categories = projectsService.listCategories()
 
@@ -48,6 +51,7 @@ export default async function Home() {
         <Leaders leaders={leaders} />
         <Events events={events} />
         <Challenges challenges={challenges} />
+        <Ranking ranking={ranking} />
         <Showcase projects={projects} categories={categories} />
         <Mentorship />
       </main>
