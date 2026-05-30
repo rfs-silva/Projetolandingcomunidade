@@ -182,59 +182,37 @@ export default async function AdminHomePage() {
         </div>
       </section>
 
-      {/* Mentoria detalhada */}
+      {/* Funil de mentoria - barra horizontal segmentada */}
       <section>
         <SectionTitle title="Funil de mentoria" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <FunnelCard
-            icon={<Send size={16} />}
-            label="Pendentes"
-            value={stats.mentorship.pending}
-            tone={stats.mentorship.pending > 0 ? 'warn' : 'default'}
-            href="/admin/mentoria?status=SUBMITTED"
-          />
-          <FunnelCard
-            icon={<Clock size={16} />}
-            label="Em análise"
-            value={stats.mentorship.inReview}
-            href="/admin/mentoria?status=IN_REVIEW"
-          />
-          <FunnelCard
-            icon={<CheckCircle2 size={16} />}
-            label="Aceitas"
-            value={stats.mentorship.accepted}
-            tone="success"
-            href="/admin/mentoria?status=ACCEPTED"
-          />
-          <FunnelCard
-            icon={<Handshake size={16} />}
-            label="Recusadas"
-            value={stats.mentorship.rejected}
-            href="/admin/mentoria?status=REJECTED"
-          />
-        </div>
+        <MentorshipFunnel
+          pending={stats.mentorship.pending}
+          inReview={stats.mentorship.inReview}
+          accepted={stats.mentorship.accepted}
+          rejected={stats.mentorship.rejected}
+        />
       </section>
 
-      {/* Conteudo da comunidade */}
+      {/* Conteudo da comunidade - lista compacta */}
       <section>
         <SectionTitle title="Conteúdo da comunidade" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <ContentCard
-            icon={<Calendar size={18} />}
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <ContentRow
+            icon={<Calendar size={16} />}
             label="Eventos"
             total={stats.events.total}
             members={stats.events.members}
             href="/admin/eventos"
           />
-          <ContentCard
-            icon={<Target size={18} />}
+          <ContentRow
+            icon={<Target size={16} />}
             label="Desafios"
             total={stats.challenges.total}
             members={stats.challenges.members}
             href="/admin/desafios"
           />
-          <ContentCard
-            icon={<FolderGit2 size={18} />}
+          <ContentRow
+            icon={<FolderGit2 size={16} />}
             label="Projetos"
             total={stats.projects.total}
             members={stats.projects.members}
@@ -242,17 +220,25 @@ export default async function AdminHomePage() {
         </div>
       </section>
 
-      {/* Plataforma */}
-      <section>
-        <SectionTitle title="Plataforma" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <MetaCard icon={<Tag size={16} />} label="Tags" value={stats.tags} />
-          <MetaCard
-            icon={<ShieldCheck size={16} />}
-            label="Status"
-            value="OK"
-            tone="success"
-          />
+      {/* Plataforma - tira horizontal compacta */}
+      <section className="border-t border-subtle pt-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 text-sm">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <InlineMeta
+              icon={<Tag size={14} />}
+              label="Tags"
+              value={stats.tags}
+            />
+            <InlineMeta
+              icon={<ShieldCheck size={14} className="text-emerald-300" />}
+              label="Status"
+              value="OK"
+              valueClassName="text-emerald-300"
+            />
+          </div>
+          <span className="text-xs text-muted-foreground">
+            Comunidade Roraima Fullstack Developers
+          </span>
         </div>
       </section>
     </div>
@@ -427,42 +413,118 @@ function TypeBar({
   )
 }
 
-function FunnelCard({
-  icon,
-  label,
-  value,
-  tone = 'default',
-  href,
+function MentorshipFunnel({
+  pending,
+  inReview,
+  accepted,
+  rejected,
 }: {
-  icon: React.ReactNode
-  label: string
-  value: number
-  tone?: 'default' | 'warn' | 'success'
-  href?: string
+  pending: number
+  inReview: number
+  accepted: number
+  rejected: number
 }) {
-  const klass =
-    tone === 'success'
-      ? 'border-emerald-500/40 bg-emerald-500/10 hover:border-emerald-500/60'
-      : tone === 'warn'
-        ? 'border-amber-500/40 bg-amber-500/10 hover:border-amber-500/60'
-        : 'border-subtle bg-card hover:border-muted'
-  const inner = (
-    <div
-      className={
-        'rounded-xl border p-4 transition-colors ' + klass + ' h-full'
-      }
-    >
-      <div className="flex items-center gap-2 text-muted-foreground text-xs">
-        {icon}
-        <span>{label}</span>
+  const total = pending + inReview + accepted + rejected
+  const segments = [
+    {
+      key: 'SUBMITTED',
+      label: 'Pendentes',
+      value: pending,
+      color: 'bg-amber-400',
+      text: 'text-amber-300',
+      dot: 'bg-amber-400',
+    },
+    {
+      key: 'IN_REVIEW',
+      label: 'Em análise',
+      value: inReview,
+      color: 'bg-primary',
+      text: 'text-primary-destaque',
+      dot: 'bg-primary',
+    },
+    {
+      key: 'ACCEPTED',
+      label: 'Aceitas',
+      value: accepted,
+      color: 'bg-emerald-400',
+      text: 'text-emerald-300',
+      dot: 'bg-emerald-400',
+    },
+    {
+      key: 'REJECTED',
+      label: 'Recusadas',
+      value: rejected,
+      color: 'bg-zinc-500',
+      text: 'text-muted-foreground',
+      dot: 'bg-zinc-500',
+    },
+  ]
+
+  if (total === 0) {
+    return (
+      <div className="rounded-xl border border-dashed border-border bg-card py-8 text-center text-sm text-muted-foreground">
+        Nenhuma candidatura registrada ainda.
       </div>
-      <div className="mt-2 text-2xl font-semibold text-foreground">{value}</div>
+    )
+  }
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <div className="flex items-baseline justify-between mb-4">
+        <div className="flex items-baseline gap-2">
+          <span className="text-3xl font-semibold text-foreground leading-none">
+            {total}
+          </span>
+          <span className="text-xs uppercase tracking-wider text-muted-foreground">
+            candidaturas
+          </span>
+        </div>
+        <span className="text-[10px] uppercase tracking-wider text-emerald-300 inline-flex items-center gap-1">
+          <CheckCircle2 size={10} /> {total === 0 ? 0 : Math.round((accepted / total) * 100)}% aceitas
+        </span>
+      </div>
+
+      <div className="h-3 rounded-full bg-background-secondary border border-border overflow-hidden flex">
+        {segments.map((s) =>
+          s.value > 0 ? (
+            <div
+              key={s.key}
+              className={s.color}
+              style={{ width: `${(s.value / total) * 100}%` }}
+              title={`${s.label}: ${s.value}`}
+            />
+          ) : null,
+        )}
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+        {segments.map((s) => {
+          const href =
+            s.key === 'SUBMITTED'
+              ? '/admin/mentoria?status=SUBMITTED'
+              : s.key === 'IN_REVIEW'
+                ? '/admin/mentoria?status=IN_REVIEW'
+                : s.key === 'ACCEPTED'
+                  ? '/admin/mentoria?status=ACCEPTED'
+                  : '/admin/mentoria?status=REJECTED'
+          return (
+            <Link
+              key={s.key}
+              href={href}
+              className="group inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <span className={'w-2 h-2 rounded-full ' + s.dot} />
+              <span className="uppercase tracking-wider">{s.label}</span>
+              <span className={'font-semibold ' + s.text}>{s.value}</span>
+            </Link>
+          )
+        })}
+      </div>
     </div>
   )
-  return href ? <Link href={href}>{inner}</Link> : inner
 }
 
-function ContentCard({
+function ContentRow({
   icon,
   label,
   total,
@@ -477,57 +539,60 @@ function ContentCard({
 }) {
   const pct = total === 0 ? 0 : Math.round((members / total) * 100)
   const inner = (
-    <div className="rounded-xl border border-subtle bg-card p-5 hover:border-muted transition-colors h-full">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-wider">
-          {icon}
-          <span>{label}</span>
+    <div className="group flex items-center gap-4 px-5 py-4 border-b border-border/60 last:border-b-0 hover:bg-background-secondary/40 transition-colors">
+      <span className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/30 text-primary-destaque flex items-center justify-center shrink-0">
+        {icon}
+      </span>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-baseline justify-between gap-3">
+          <span className="text-sm font-medium text-foreground">{label}</span>
+          <span className="text-xs text-muted-foreground">
+            <span className="text-foreground font-semibold">{total}</span> total
+            ·{' '}
+            <span className="text-primary-destaque font-medium">{members}</span>{' '}
+            exclusivos
+          </span>
         </div>
-        <span className="text-[10px] uppercase tracking-wider text-primary-destaque bg-primary/5 border border-primary/20 px-2 py-0.5 rounded">
-          {pct}% exclusivos
-        </span>
+        <div className="mt-2 h-1 rounded-full bg-background-secondary border border-border overflow-hidden">
+          <div
+            className="h-full bg-primary/60"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
       </div>
-      <div className="mt-3 flex items-baseline gap-3">
-        <span className="text-3xl font-semibold text-foreground">{total}</span>
-        <span className="text-xs text-muted-foreground">total</span>
-      </div>
-      <div className="mt-3 h-1.5 rounded-full bg-background-secondary border border-border overflow-hidden">
-        <div
-          className="h-full bg-primary/60"
-          style={{ width: `${pct}%` }}
+      {href ? (
+        <ArrowRight
+          size={14}
+          className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
         />
-      </div>
-      <div className="mt-2 text-xs text-muted-foreground">
-        <span className="text-primary-destaque font-medium">{members}</span>{' '}
-        exclusivos · {total - members} públicos
-      </div>
+      ) : null}
     </div>
   )
   return href ? <Link href={href}>{inner}</Link> : inner
 }
 
-function MetaCard({
+function InlineMeta({
   icon,
   label,
   value,
-  tone = 'default',
+  valueClassName,
 }: {
   icon: React.ReactNode
   label: string
   value: string | number
-  tone?: 'default' | 'success'
+  valueClassName?: string
 }) {
-  const klass =
-    tone === 'success'
-      ? 'border-emerald-500/40 bg-emerald-500/10'
-      : 'border-subtle bg-card'
   return (
-    <div className={'rounded-xl border p-4 ' + klass}>
-      <div className="flex items-center gap-2 text-muted-foreground text-xs">
-        {icon}
-        <span>{label}</span>
-      </div>
-      <div className="mt-2 text-2xl font-semibold text-foreground">{value}</div>
-    </div>
+    <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+      {icon}
+      <span className="uppercase tracking-wider">{label}</span>
+      <span
+        className={
+          'font-semibold ' + (valueClassName ?? 'text-foreground')
+        }
+      >
+        {value}
+      </span>
+    </span>
   )
 }
