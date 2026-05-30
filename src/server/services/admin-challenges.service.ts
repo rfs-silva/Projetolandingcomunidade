@@ -21,6 +21,7 @@ type ChallengeRowWithTags = {
   description: string
   imageIndex: number
   visibility: DbVisibility
+  points: number
   tags: { iconName: string; label: string }[]
 }
 
@@ -31,6 +32,7 @@ function toDto(row: ChallengeRowWithTags): ChallengeDto {
     description: row.description,
     imageIndex: row.imageIndex,
     visibility: row.visibility,
+    points: row.points,
     tags: row.tags.map((t) => ({ iconName: t.iconName, label: t.label })),
   })
 }
@@ -77,6 +79,7 @@ export const adminChallengesService = {
           description: data.description,
           imageIndex: data.imageIndex,
           visibility: DbVisibility[data.visibility],
+          points: data.points,
         },
       })
       if (data.tags.length > 0) {
@@ -122,6 +125,7 @@ export const adminChallengesService = {
           description: data.description,
           imageIndex: data.imageIndex,
           visibility: DbVisibility[data.visibility],
+          points: data.points,
         },
       })
       await tx.challengeTag.deleteMany({ where: { challengeId: id } })

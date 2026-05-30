@@ -24,6 +24,7 @@ export const eventSchema = z
     type: eventTypeSchema,
     visibility: visibilitySchema,
     imageIndex: z.number().int().openapi({ example: 201 }),
+    points: z.number().int().openapi({ example: 10 }),
   })
   .openapi('Event')
 
@@ -61,6 +62,7 @@ export const eventInputSchema = z
     type: eventTypeSchema,
     visibility: visibilitySchema,
     imageIndex: z.coerce.number().int().min(0).max(1000),
+    points: z.coerce.number().int().min(1).max(100).default(10),
   })
   .openapi('EventInput')
 

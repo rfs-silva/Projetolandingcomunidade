@@ -3,12 +3,14 @@ import {
   Calendar,
   FolderGit2,
   Handshake,
+  Send,
   ShieldCheck,
   Tag,
   Target,
   Users,
 } from 'lucide-react'
 import { adminStatsService } from '@/server/services/admin-stats.service'
+import { adminProgressService } from '@/server/services/admin-progress.service'
 import { requireAdminSession } from '@/server/lib/admin-session'
 
 export const metadata = {
@@ -26,7 +28,10 @@ const TYPE_LABEL: Record<string, string> = {
 
 export default async function AdminHomePage() {
   await requireAdminSession()
-  const stats = await adminStatsService.load()
+  const [stats, pendingSubmissions] = await Promise.all([
+    adminStatsService.load(),
+    adminProgressService.countPendingSubmissions(),
+  ])
 
   return (
     <div className="flex flex-col gap-8">
@@ -59,6 +64,21 @@ export default async function AdminHomePage() {
               href={`/admin/usuarios?type=${type}`}
             />
           ))}
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">
+          Pendências de revisão
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <StatCard
+            icon={<Send size={18} />}
+            label="Submissões aguardando"
+            value={pendingSubmissions}
+            href="/admin/submissoes"
+            tone={pendingSubmissions > 0 ? 'attention' : 'default'}
+          />
         </div>
       </section>
 

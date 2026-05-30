@@ -18,6 +18,7 @@ export const challengeSchema = z
     tags: z.array(challengeTagSchema),
     visibility: challengeVisibilitySchema,
     imageIndex: z.number().int().openapi({ example: 1 }),
+    points: z.number().int().openapi({ example: 20 }),
   })
   .openapi('Challenge')
 
@@ -28,6 +29,7 @@ export const challengeInputSchema = z
     description: z.string().trim().min(10).max(500),
     imageIndex: z.coerce.number().int().min(0).max(1000),
     visibility: challengeVisibilitySchema,
+    points: z.coerce.number().int().min(1).max(100).default(20),
     tags: z
       .array(challengeTagSchema)
       .max(6, 'Máximo de 6 tags por desafio')

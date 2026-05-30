@@ -13,6 +13,7 @@ type ChallengeRow = {
   description: string
   imageIndex: number
   visibility: 'PUBLIC' | 'MEMBERS'
+  points: number
   tags: { iconName: string; label: string }[]
 }
 
@@ -23,6 +24,7 @@ function toDto(row: ChallengeRow): ChallengeDto {
     description: row.description,
     imageIndex: row.imageIndex,
     visibility: row.visibility,
+    points: row.points,
     tags: row.tags.map((t) => ({ iconName: t.iconName, label: t.label })),
   }
 }

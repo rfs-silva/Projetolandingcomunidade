@@ -24,6 +24,7 @@ function toDto(row: {
   type: DbEventType
   visibility: DbVisibility
   imageIndex: number
+  points: number
 }): EventDto {
   return eventSchema.parse({
     number: row.number,
@@ -34,6 +35,7 @@ function toDto(row: {
     type: row.type === DbEventType.REMOTO ? 'Remoto' : 'Presencial',
     visibility: row.visibility,
     imageIndex: row.imageIndex,
+    points: row.points,
   })
 }
 
@@ -77,6 +79,7 @@ export const adminEventsService = {
         type: data.type === 'Remoto' ? DbEventType.REMOTO : DbEventType.PRESENCIAL,
         visibility: DbVisibility[data.visibility],
         imageIndex: data.imageIndex,
+        points: data.points,
       },
     })
     return { ...toDto(row), id: row.id }
@@ -112,6 +115,7 @@ export const adminEventsService = {
         type: data.type === 'Remoto' ? DbEventType.REMOTO : DbEventType.PRESENCIAL,
         visibility: DbVisibility[data.visibility],
         imageIndex: data.imageIndex,
+        points: data.points,
       },
     })
     return { ...toDto(row), id: row.id }

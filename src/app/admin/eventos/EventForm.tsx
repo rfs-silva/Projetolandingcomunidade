@@ -15,6 +15,7 @@ type Initial = {
   type?: 'Remoto' | 'Presencial'
   visibility?: 'PUBLIC' | 'MEMBERS'
   imageIndex?: number
+  points?: number
 }
 
 export function EventForm({ initial }: { initial?: Initial }) {
@@ -35,6 +36,7 @@ export function EventForm({ initial }: { initial?: Initial }) {
       type: formData.get('type'),
       visibility: formData.get('visibility'),
       imageIndex: Number(formData.get('imageIndex')),
+      points: Number(formData.get('points')),
     }
 
     const url = isEditing
@@ -113,7 +115,7 @@ export function EventForm({ initial }: { initial?: Initial }) {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Select
           label="Modalidade"
           name="type"
@@ -141,6 +143,14 @@ export function EventForm({ initial }: { initial?: Initial }) {
           required
           defaultValue={String(initial?.imageIndex ?? 200)}
           placeholder="200"
+        />
+        <Field
+          label="Pontos (1-100)"
+          name="points"
+          type="number"
+          required
+          defaultValue={String(initial?.points ?? 10)}
+          placeholder="10"
         />
       </div>
 

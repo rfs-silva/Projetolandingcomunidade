@@ -16,6 +16,7 @@ type Initial = {
   description?: string
   imageIndex?: number
   visibility?: 'PUBLIC' | 'MEMBERS'
+  points?: number
   tags?: Tag[]
 }
 
@@ -51,6 +52,7 @@ export function ChallengeForm({ initial }: { initial?: Initial }) {
       description: formData.get('description'),
       imageIndex: Number(formData.get('imageIndex')),
       visibility: formData.get('visibility'),
+      points: Number(formData.get('points')),
       tags,
     }
 
@@ -113,7 +115,7 @@ export function ChallengeForm({ initial }: { initial?: Initial }) {
         placeholder="O que o desafio propõe, critérios de avaliação..."
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Select
           label="Visibilidade"
           name="visibility"
@@ -131,6 +133,14 @@ export function ChallengeForm({ initial }: { initial?: Initial }) {
           required
           defaultValue={String(initial?.imageIndex ?? 1)}
           placeholder="1"
+        />
+        <Field
+          label="Pontos (1-100)"
+          name="points"
+          type="number"
+          required
+          defaultValue={String(initial?.points ?? 20)}
+          placeholder="20"
         />
       </div>
 

@@ -50,6 +50,7 @@ export default async function EditChallengePage({
           description: challenge.description,
           imageIndex: challenge.imageIndex,
           visibility: challenge.visibility,
+          points: challenge.points,
           tags: challenge.tags,
         }}
       />

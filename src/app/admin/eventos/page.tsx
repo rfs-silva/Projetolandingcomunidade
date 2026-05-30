@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Calendar, Lock, Pencil, Plus } from 'lucide-react'
+import { Calendar, Lock, Pencil, Plus, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { requireAdminSession } from '@/server/lib/admin-session'
 import { adminEventsService } from '@/server/services/admin-events.service'
@@ -101,6 +101,19 @@ export default async function AdminEventsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2 justify-end">
+                      <Link
+                        href={`/admin/eventos/${event.id}/inscritos`}
+                      >
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          icon={<Users size={14} />}
+                          iconPosition="left"
+                        >
+                          Inscritos
+                        </Button>
+                      </Link>
                       <Link href={`/admin/eventos/${event.id}/editar`}>
                         <Button
                           type="button"

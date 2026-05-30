@@ -53,6 +53,7 @@ export default async function EditEventPage({
           type: event.type,
           visibility: event.visibility,
           imageIndex: event.imageIndex,
+          points: event.points,
         }}
       />
     </div>
