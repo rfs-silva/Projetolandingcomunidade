@@ -628,10 +628,13 @@ export function generateOpenApiDocument() {
     openapi: '3.1.0',
     info: {
       title: 'Comunidade Roraima Fullstack Developers API',
-      version: '1.0.0',
+      version: '1.1.0',
       description:
         'API REST que alimenta a plataforma. Endpoints públicos não exigem auth; ' +
-        'rotas `/api/me/*` e `/api/admin/*` usam cookie de sessão emitido pelo Auth.js.',
+        'rotas `/api/me/*` e `/api/admin/*` usam cookie de sessão emitido pelo Auth.js.\n\n' +
+        '**Nota POC:** alguns endpoints novos (gamificação, ranking, empresas, aprovações ' +
+        'de conteúdo, marcação de liderança em destaque) ainda não estão totalmente documentados ' +
+        'aqui — ver código em `src/app/api/` ou o roadmap no README.',
       contact: { email: process.env.DPO_EMAIL || 'contato@comunidaderoraima.dev' },
     },
     servers: [
@@ -642,6 +645,8 @@ export function generateOpenApiDocument() {
       { name: 'Me', description: 'Conta do usuário autenticado' },
       { name: 'Members', description: 'Mural de membros' },
       { name: 'Forum', description: 'Tópicos e respostas' },
+      { name: 'Gamification', description: 'Participação em desafios, eventos, pontos e ranking' },
+      { name: 'Companies', description: 'Candidaturas e gestão de empresas parceiras' },
       { name: 'Privacy', description: 'LGPD: export e exclusão de conta' },
       { name: 'Admin', description: 'Restritos a LEADER/FOUNDER' },
     ],
