@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import '@/styles/globals.css'
 import { AuthProvider } from '@/components/providers/AuthProvider'
+import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -20,6 +21,19 @@ export const metadata: Metadata = {
   },
   description:
     'Comunidade de desenvolvedores de Roraima. Mentoria, desafios, eventos e projetos.',
+  applicationName: 'Comunidade Roraima Fullstack Developers',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'CRFD',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    icon: [{ url: '/logo.svg', type: 'image/svg+xml' }],
+    apple: [{ url: '/logo.svg' }],
+  },
 }
 
 export const viewport: Viewport = {
@@ -46,6 +60,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>{children}</AuthProvider>
+        <ServiceWorkerRegister />
       </body>
     </html>
   )
