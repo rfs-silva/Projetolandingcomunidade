@@ -4,17 +4,16 @@ import { requireDashboardSession } from '@/server/lib/dashboard-session'
 
 export const dynamic = 'force-dynamic'
 
-export default async function DashboardLayout({
+export default async function CompanyDashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const session = await requireDashboardSession()
+  const session = await requireDashboardSession('/empresa/painel')
 
-  // Empresas têm jornada própria. Não faz sentido cair na área de
-  // membro (mural, mentoria, projetos pessoais, fórum).
-  if (session.profile.type === 'COMPANY') {
-    redirect('/empresa/painel')
+  // Apenas COMPANY entra aqui. Outros perfis são redirecionados.
+  if (session.profile.type !== 'COMPANY') {
+    redirect(session.profile.type === 'MEMBER' ? '/dashboard' : '/admin')
   }
 
   return (
@@ -23,6 +22,8 @@ export default async function DashboardLayout({
         image={session.image}
         displayName={session.profile.displayName}
         seed={session.githubUsername}
+        role="COMPANY"
+        profileHref="/empresa/painel"
       />
       {children}
     </div>

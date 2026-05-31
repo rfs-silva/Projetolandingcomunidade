@@ -22,7 +22,11 @@ export default async function OnboardingPage({
   if (!session?.user?.id) redirect('/login?callbackUrl=/onboarding')
 
   const already = await profileService.hasCompletedOnboarding(session.user.id)
-  if (already) redirect('/dashboard')
+  if (already) {
+    // Empresa não passa pela tela de onboarding de membro.
+    const profile = await profileService.getByUserId(session.user.id)
+    redirect(profile?.type === 'COMPANY' ? '/empresa/painel' : '/dashboard')
+  }
 
   async function submit(formData: FormData) {
     'use server'
