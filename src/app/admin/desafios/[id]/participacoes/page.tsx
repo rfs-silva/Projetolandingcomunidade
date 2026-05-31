@@ -21,12 +21,15 @@ export default async function AdminChallengeParticipationsPage({
   params: Promise<{ id: string }>
   searchParams: Promise<{ status?: string }>
 }) {
-  await requireAdminSession()
+  const session = await requireAdminSession()
   const { id } = await params
   const { status: rawStatus } = await searchParams
   const activeStatus = ALLOWED_STATUSES.find((s) => s === rawStatus)
 
-  const challenge = await adminChallengesService.getById(id)
+  const challenge = await adminChallengesService.getById(id, {
+    userId: session.userId,
+    profileType: session.profile.type,
+  })
   const all = await adminProgressService.listChallengeParticipations(
     challenge.number,
   )

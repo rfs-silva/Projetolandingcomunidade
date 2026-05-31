@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { adminChallengesService } from '@/server/services/admin-challenges.service'
-import { requireContentCreatorUserId } from '@/server/http/admin'
+import { requireContentCreatorActor } from '@/server/http/admin'
 import { ok } from '@/server/http/response'
 import { handleError } from '@/server/http/errors'
 
@@ -11,10 +11,10 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    await requireContentCreatorUserId()
+    const actor = await requireContentCreatorActor()
     const { id } = await params
     const body = await request.json()
-    const updated = await adminChallengesService.update(id, body)
+    const updated = await adminChallengesService.update(id, body, actor)
     return ok(updated)
   } catch (error) {
     return handleError(error)
@@ -26,9 +26,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    await requireContentCreatorUserId()
+    const actor = await requireContentCreatorActor()
     const { id } = await params
-    await adminChallengesService.remove(id)
+    await adminChallengesService.remove(id, actor)
     return new NextResponse(null, { status: 204 })
   } catch (error) {
     return handleError(error)

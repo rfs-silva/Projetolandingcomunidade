@@ -16,9 +16,12 @@ export default async function AdminEventRegistrationsPage({
 }: {
   params: Promise<{ id: string }>
 }) {
-  await requireAdminSession()
+  const session = await requireAdminSession()
   const { id } = await params
-  const event = await adminEventsService.getById(id)
+  const event = await adminEventsService.getById(id, {
+    userId: session.userId,
+    profileType: session.profile.type,
+  })
   const registrations = await adminProgressService.listEventRegistrations(
     event.number,
   )

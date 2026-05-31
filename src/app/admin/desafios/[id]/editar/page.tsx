@@ -15,9 +15,12 @@ export default async function EditChallengePage({
 }: {
   params: Promise<{ id: string }>
 }) {
-  await requireContentCreatorSession()
+  const session = await requireContentCreatorSession()
   const { id } = await params
-  const challenge = await adminChallengesService.getById(id)
+  const challenge = await adminChallengesService.getById(id, {
+    userId: session.userId,
+    profileType: session.profile.type,
+  })
 
   return (
     <div className="flex flex-col gap-6 max-w-2xl">

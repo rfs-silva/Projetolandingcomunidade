@@ -7,6 +7,7 @@ import {
   Clock,
   FolderGit2,
   Handshake,
+  Inbox,
   MessageSquare,
   Send,
   ShieldCheck,
@@ -19,6 +20,8 @@ import {
 import { redirect } from 'next/navigation'
 import { adminStatsService } from '@/server/services/admin-stats.service'
 import { adminProgressService } from '@/server/services/admin-progress.service'
+import { adminEventsService } from '@/server/services/admin-events.service'
+import { adminChallengesService } from '@/server/services/admin-challenges.service'
 import { companiesService } from '@/server/services/companies.service'
 import {
   isAdminType,
@@ -50,14 +53,26 @@ export default async function AdminHomePage() {
   if (!isAdminType(session.profile.type)) {
     redirect('/admin/eventos')
   }
-  const [stats, pendingSubmissions, pendingCompanies] = await Promise.all([
+  const [
+    stats,
+    pendingSubmissions,
+    pendingCompanies,
+    pendingEvents,
+    pendingChallenges,
+  ] = await Promise.all([
     adminStatsService.load(),
     adminProgressService.countPendingSubmissions(),
     companiesService.countPending(),
+    adminEventsService.countPendingApproval(),
+    adminChallengesService.countPendingApproval(),
   ])
 
+  const pendingContent = pendingEvents + pendingChallenges
   const pendingTotal =
-    pendingSubmissions + stats.mentorship.pending + pendingCompanies
+    pendingSubmissions +
+    stats.mentorship.pending +
+    pendingCompanies +
+    pendingContent
   const firstName = session.profile.displayName.split(' ')[0]
 
   return (
@@ -106,27 +121,34 @@ export default async function AdminHomePage() {
       {/* Pendencias de acao */}
       <section>
         <SectionTitle title="Aguardando ação" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          <ActionCard
+            href="/admin/aprovacoes"
+            icon={<Inbox size={20} />}
+            title="Propostas de empresa"
+            count={pendingContent}
+            description="Eventos e desafios aguardando aprovação."
+          />
           <ActionCard
             href="/admin/submissoes"
             icon={<Send size={20} />}
             title="Submissões de desafios"
             count={pendingSubmissions}
-            description="Avaliar e aprovar trabalhos enviados pelos membros."
+            description="Avaliar trabalhos enviados pelos membros."
           />
           <ActionCard
             href="/admin/mentoria?status=SUBMITTED"
             icon={<Handshake size={20} />}
             title="Candidaturas de mentoria"
             count={stats.mentorship.pending}
-            description="Triar mentores e mentorados aguardando análise."
+            description="Triar mentores e mentorados."
           />
           <ActionCard
             href="/admin/empresas?status=PENDING"
             icon={<Building2 size={20} />}
             title="Candidaturas de empresa"
             count={pendingCompanies}
-            description="Avaliar empresas que querem participar da comunidade."
+            description="Avaliar empresas novas."
           />
         </div>
       </section>
