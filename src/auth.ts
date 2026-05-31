@@ -90,6 +90,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return true
     },
 
+    // jwt roda no runtime Node (durante signIn). Aqui podemos consultar
+    // Prisma livremente para popular o token com tudo que a sessão precisa.
     async jwt({ token, account, profile, user }) {
       if (user) {
         token.name = user.name ?? token.name
@@ -110,25 +112,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       if (account?.provider === 'company-email' && user?.id) {
         ;(token as { userId?: string }).userId = user.id
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: {
+            avatarUrl: true,
+            githubUsername: true,
+            profile: { select: { displayName: true } },
+          },
+        })
+        if (dbUser?.profile?.displayName) token.name = dbUser.profile.displayName
+        if (dbUser?.avatarUrl) token.picture = dbUser.avatarUrl
+        if (dbUser?.githubUsername) {
+          ;(token as { githubUsername?: string }).githubUsername =
+            dbUser.githubUsername
+        }
       }
       return token
     },
 
+    // session é chamada inclusive pelo middleware (edge runtime). NÃO chamar
+    // Prisma aqui — popula tudo no token via jwt.
     async session({ session, token }) {
       const t = token as { userId?: string; githubUsername?: string }
-      if (t.userId) {
-        session.user.id = t.userId
-        if (!session.user.image) {
-          const dbUser = await prisma.user.findUnique({
-            where: { id: t.userId },
-            select: { avatarUrl: true, githubUsername: true },
-          })
-          if (dbUser?.avatarUrl) session.user.image = dbUser.avatarUrl
-          if (dbUser?.githubUsername && !t.githubUsername) {
-            session.user.githubUsername = dbUser.githubUsername
-          }
-        }
-      }
+      if (t.userId) session.user.id = t.userId
       if (t.githubUsername) session.user.githubUsername = t.githubUsername
       return session
     },

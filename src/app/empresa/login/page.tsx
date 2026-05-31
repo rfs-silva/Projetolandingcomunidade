@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
+import { AuthError } from 'next-auth'
 import { AlertTriangle, ArrowRight, Building2 } from 'lucide-react'
 import { auth, signIn } from '@/auth'
 import { Button } from '@/components/ui/button'
@@ -69,8 +70,14 @@ export default async function CompanyLoginPage({
                 email,
                 redirectTo: '/empresa/painel',
               })
-            } catch {
-              redirect('/empresa/login?error=1')
+            } catch (err) {
+              // signIn dispara NEXT_REDIRECT em caso de sucesso. Esse erro
+              // tem que propagar pro Next.js efetivar o redirect. Só tratamos
+              // erros do Auth.js (credenciais inválidas, etc.).
+              if (err instanceof AuthError) {
+                redirect('/empresa/login?error=1')
+              }
+              throw err
             }
           }}
           className="flex flex-col gap-4"
