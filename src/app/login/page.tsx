@@ -71,16 +71,24 @@ export default async function LoginPage({
           Ao continuar você concorda com nossos Termos e Política de Privacidade.
         </p>
 
-        <div className="border-t border-subtle pt-6 text-center">
+        <div className="border-t border-subtle pt-6 text-center space-y-1">
           <p className="text-xs text-muted-foreground">
             Empresa sem GitHub?
           </p>
-          <Link
-            href="/empresa/cadastro"
-            className="mt-1 inline-flex text-sm text-primary-destaque hover:underline"
-          >
-            Candidatar a empresa →
-          </Link>
+          <div className="flex flex-col gap-1">
+            <Link
+              href="/empresa/login"
+              className="text-sm text-primary-destaque hover:underline"
+            >
+              Entrar como empresa →
+            </Link>
+            <Link
+              href="/empresa/cadastro"
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
+              ou candidatar a empresa
+            </Link>
+          </div>
         </div>
 
         <Link
