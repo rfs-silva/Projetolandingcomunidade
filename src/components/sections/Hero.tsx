@@ -21,7 +21,7 @@ const Hero: React.FC = () => {
           <div className="relative flex flex-col items-center">
             <Image
               src="/logo.svg"
-              alt="Comunidade Roraima Devs"
+              alt="Comunidade Roraima Fullstack Developers"
               width={128}
               height={128}
               priority
@@ -35,7 +35,7 @@ const Hero: React.FC = () => {
             Faça parte da comunidade
           </span>
           <span className="block text-3xl sm:text-4xl md:text-6xl lg:text-7xl text-foreground mt-2 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] md:whitespace-nowrap">
-            Roraima Devs
+            Fullstack Roraima
           </span>
         </h1>
 

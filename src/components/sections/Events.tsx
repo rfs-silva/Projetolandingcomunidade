@@ -93,7 +93,7 @@ const Events: React.FC<EventsProps> = ({ events }) => {
             Eventos
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-5xl leading-relaxed">
-            A Comunidade Roraima Devs é um lugar para desenvolvedores
+            A Comunidade Roraima Fullstack Developers é um lugar para devs
             aprenderem, compartilharem e crescerem. Nossa comunidade é
             construída por desenvolvedores, para desenvolvedores.
           </p>

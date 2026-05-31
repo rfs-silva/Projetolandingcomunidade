@@ -101,7 +101,7 @@ const Header: React.FC = () => {
           >
             <Image
               src="/logo-horizontal.svg"
-              alt="Comunidade Roraima Devs"
+              alt="Comunidade Roraima Fullstack Developers"
               height={40}
               width={40}
               priority
@@ -241,7 +241,7 @@ const Header: React.FC = () => {
             )}
 
             <p className="text-center text-muted-secondary text-xs mt-4">
-              © {new Date().getFullYear()} Comunidade Roraima Devs
+              © {new Date().getFullYear()} Comunidade Roraima Fullstack Developers
             </p>
           </div>
         </div>

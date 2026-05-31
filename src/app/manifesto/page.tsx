@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Manifesto · Comunidade Roraima Devs',
+  title: 'Manifesto · Comunidade Roraima Fullstack Developers',
   description:
     'O que acreditamos, como nos organizamos e o que oferecemos como comunidade.',
 }
@@ -27,7 +27,7 @@ export default function ManifestoPage() {
         <section className="prose prose-invert mt-12 max-w-none text-foreground/90 space-y-10">
           <Block title="Quem somos">
             <p>
-              Somos a <strong>Comunidade Roraima Devs</strong> — desenvolvedores,
+              Somos a <strong>Comunidade Roraima Fullstack Developers</strong> — desenvolvedores,
               empresas e lideranças que acreditam que tecnologia muda
               trajetórias e que o ecossistema local cresce quando o conhecimento
               circula com generosidade.

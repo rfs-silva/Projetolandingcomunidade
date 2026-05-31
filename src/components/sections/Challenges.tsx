@@ -107,7 +107,7 @@ const Challenges: React.FC<ChallengesProps> = ({ challenges }) => {
             Desafios
           </h2>
           <p className="text-lg text-muted-foreground max-w-5xl leading-relaxed">
-            A Comunidade Roraima Devs é um lugar para desenvolvedores
+            A Comunidade Roraima Fullstack Developers é um lugar para devs
             aprenderem, compartilharem e crescerem. Nossa comunidade é
             construída por desenvolvedores, para desenvolvedores.
           </p>
