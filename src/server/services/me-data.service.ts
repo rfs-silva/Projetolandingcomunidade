@@ -2,6 +2,10 @@ import 'server-only'
 import { prisma } from '@/server/lib/prisma'
 import { AppError, NotFoundError } from '@/server/http/errors'
 import { privacyEventsService } from '@/server/services/privacy-events.service'
+import {
+  DPO_EMAIL,
+  PRIVACY_CONTROLLER_NAME,
+} from '@/server/lib/privacy-contact'
 
 export const DELETE_ACCOUNT_PHRASE = 'EXCLUIR MINHA CONTA'
 
@@ -114,8 +118,8 @@ export const meDataService = {
       exportedAt: exportedAt.toISOString(),
       schemaVersion: '1.0',
       controller: {
-        name: 'Comunidade Roraima Fullstack Developers',
-        dpoContact: 'privacidade@comunidaderoraima.dev',
+        name: PRIVACY_CONTROLLER_NAME,
+        dpoContact: DPO_EMAIL,
         notice:
           'Exportação realizada conforme art. 18 II e V da LGPD. Para dúvidas, contate o DPO.',
       },

@@ -1,10 +1,9 @@
 import Link from 'next/link'
+import { DPO_EMAIL } from '@/server/lib/privacy-contact'
 
 export const metadata = {
   title: 'Política de Privacidade',
 }
-
-const DPO_EMAIL = 'privacidade@comunidaderoraima.dev'
 
 export default function PrivacidadePage() {
   return (

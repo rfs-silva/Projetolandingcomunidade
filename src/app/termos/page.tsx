@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { DPO_EMAIL } from '@/server/lib/privacy-contact'
 
 export const metadata = {
   title: 'Termos de Uso',
@@ -126,7 +127,7 @@ export default function TermosPage() {
             <li>Corrigir dados no seu perfil</li>
             <li>Excluir sua conta e seus dados pessoais associados</li>
             <li>
-              Contatar o encarregado em <code>privacidade@comunidaderoraima.dev</code>
+              Contatar o encarregado em <code>{DPO_EMAIL}</code>
             </li>
           </ul>
 
@@ -162,10 +163,10 @@ export default function TermosPage() {
           <p>
             Dúvidas sobre os termos:{' '}
             <a
-              href="mailto:privacidade@comunidaderoraima.dev"
+              href={`mailto:${DPO_EMAIL}`}
               className="text-primary hover:underline"
             >
-              privacidade@comunidaderoraima.dev
+              {DPO_EMAIL}
             </a>
             . Veja também as redes sociais no rodapé.
           </p>

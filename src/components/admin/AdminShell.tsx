@@ -46,28 +46,37 @@ export function AdminShell({
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-subtle bg-card/40 backdrop-blur-sm sticky top-0 z-10">
-        <div className="mx-auto max-w-7xl px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-3">
-              <Image src="/logo.svg" alt="Comunidade" width={28} height={28} />
-              <span className="text-sm font-medium text-foreground">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <Image
+                src="/logo.svg"
+                alt="Comunidade"
+                width={28}
+                height={28}
+                className="shrink-0"
+              />
+              <span className="text-sm font-medium text-foreground truncate hidden md:inline">
                 Comunidade Roraima Fullstack Developers
+              </span>
+              <span className="text-sm font-medium text-foreground md:hidden">
+                CRFD
               </span>
             </Link>
             {role === 'ADMIN' ? (
-              <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded">
+              <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded shrink-0">
                 <Shield size={10} /> Admin
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-primary-destaque bg-primary/10 border border-primary/30 px-2 py-0.5 rounded">
+              <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-primary-destaque bg-primary/10 border border-primary/30 px-2 py-0.5 rounded shrink-0">
                 <Building2 size={10} /> Empresa
               </span>
             )}
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             <Link
               href="/dashboard"
-              className="text-xs text-muted-foreground hover:text-foreground"
+              className="text-xs text-muted-foreground hover:text-foreground hidden sm:inline"
             >
               ← Voltar ao painel
             </Link>
@@ -77,7 +86,7 @@ export function AdminShell({
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-6 py-8 grid grid-cols-1 md:grid-cols-[200px_1fr] gap-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8 grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 md:gap-8">
         <nav className="md:sticky md:top-20 self-start">
           <ul className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible hide-scrollbar">
             {items.map((item) => {

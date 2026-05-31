@@ -35,6 +35,14 @@ services:
       - AUTH_TRUST_HOST=true
       - AUTH_GITHUB_ID=${AUTH_GITHUB_ID}
       - AUTH_GITHUB_SECRET=${AUTH_GITHUB_SECRET}
+      # LGPD: contato do encarregado de dados (DPO). Em prod, defina no .env.
+      - DPO_EMAIL=${DPO_EMAIL:-}
+      # Liga login dev de empresa (sem magic link). Padrão OFF em produção.
+      - ENABLE_DEV_COMPANY_LOGIN=${ENABLE_DEV_COMPANY_LOGIN:-}
+      # URL pública usada em sitemap/robots e canonical tags.
+      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-}
+      # Roda seed mesmo em produção (use só pra bootstrap inicial).
+      - RUN_SEED=${RUN_SEED:-}
     depends_on:
       postgres:
         condition: service_healthy

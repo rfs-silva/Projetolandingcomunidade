@@ -17,9 +17,9 @@ export const metadata = {
   title: 'Privacidade',
 }
 
-export const dynamic = 'force-dynamic'
+import { DPO_EMAIL } from '@/server/lib/privacy-contact'
 
-const DPO_EMAIL = 'privacidade@comunidaderoraima.dev'
+export const dynamic = 'force-dynamic'
 
 export default async function PrivacyPage() {
   const { userId, profile } = await requireDashboardSession('/dashboard/privacidade')

@@ -627,12 +627,12 @@ export function generateOpenApiDocument() {
   return generator.generateDocument({
     openapi: '3.1.0',
     info: {
-      title: 'Comunidade Roraima Devs API',
+      title: 'Comunidade Roraima Fullstack Developers API',
       version: '1.0.0',
       description:
         'API REST que alimenta a plataforma. Endpoints públicos não exigem auth; ' +
         'rotas `/api/me/*` e `/api/admin/*` usam cookie de sessão emitido pelo Auth.js.',
-      contact: { email: 'privacidade@comunidaderoraima.dev' },
+      contact: { email: process.env.DPO_EMAIL || 'contato@comunidaderoraima.dev' },
     },
     servers: [
       { url: 'http://localhost:3000', description: 'Local' },
