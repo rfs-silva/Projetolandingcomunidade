@@ -10,6 +10,39 @@ const PROTECTED_PREFIXES = ['/dashboard', '/onboarding', '/admin']
  * - Restringe permissões de browser APIs não usadas
  * - Marca áreas autenticadas como noindex e sem cache
  */
+/**
+ * Content-Security-Policy: restringe origens permitidas para reduzir
+ * superfície de XSS. Permite o mínimo necessário para o app funcionar:
+ * - `'self'`: todos os assets do mesmo domínio
+ * - `'unsafe-inline'` em styles: Tailwind/CSS-in-JS injeta inline
+ * - `'unsafe-inline' 'unsafe-eval'` em scripts: Next.js precisa em dev
+ *   e (infelizmente) usa eval em alguns chunks de runtime
+ * - imagens externas confiáveis usadas pelo app (avatars, placeholders)
+ *
+ * Em produção, considerar usar nonce ao invés de 'unsafe-inline' nos
+ * scripts. Por ora, fica restritivo o suficiente para bloquear injeção
+ * de scripts de domínios não permitidos.
+ */
+function buildCsp(): string {
+  const isDev = process.env.NODE_ENV !== 'production'
+  const directives = [
+    `default-src 'self'`,
+    `base-uri 'self'`,
+    `form-action 'self'`,
+    `frame-ancestors 'none'`,
+    `object-src 'none'`,
+    `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
+    `style-src 'self' 'unsafe-inline'`,
+    `font-src 'self' data:`,
+    `img-src 'self' data: blob: https://i.pravatar.cc https://picsum.photos https://avatars.githubusercontent.com https://*.githubusercontent.com`,
+    `connect-src 'self'`,
+    `upgrade-insecure-requests`,
+  ]
+  return directives.join('; ')
+}
+
+const CSP = buildCsp()
+
 function applySecurityHeaders(res: NextResponse, pathname: string) {
   res.headers.delete('x-powered-by')
   res.headers.delete('server')
@@ -26,7 +59,13 @@ function applySecurityHeaders(res: NextResponse, pathname: string) {
     'max-age=63072000; includeSubDomains; preload',
   )
 
+  // CSP só em respostas HTML (não em assets/API). Para APIs e arquivos
+  // estáticos, faria mais ruído do que benefício.
   const isApi = pathname.startsWith('/api')
+  if (!isApi) {
+    res.headers.set('Content-Security-Policy', CSP)
+  }
+
   const isAuthedArea =
     pathname.startsWith('/api/me') ||
     pathname.startsWith('/api/admin') ||

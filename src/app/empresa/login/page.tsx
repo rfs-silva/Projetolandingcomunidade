@@ -5,6 +5,12 @@ import { AuthError } from 'next-auth'
 import { AlertTriangle, ArrowRight, Building2 } from 'lucide-react'
 import { auth, signIn } from '@/auth'
 import { Button } from '@/components/ui/button'
+import { UnderDevelopment } from '@/components/UnderDevelopment'
+
+const DEV_LOGIN_ENABLED =
+  process.env.NODE_ENV === 'production'
+    ? process.env.ENABLE_DEV_COMPANY_LOGIN === 'true'
+    : process.env.ENABLE_DEV_COMPANY_LOGIN !== 'false'
 
 export const metadata = {
   title: 'Entrar como empresa',
@@ -20,6 +26,22 @@ export default async function CompanyLoginPage({
   const { error } = await searchParams
   const session = await auth()
   if (session?.user) redirect('/empresa/painel')
+
+  if (!DEV_LOGIN_ENABLED) {
+    return (
+      <UnderDevelopment
+        title="Login de empresa em desenvolvimento"
+        description="Estamos finalizando o login seguro por email (magic link). Quando estiver pronto, sua empresa vai receber um link no email cadastrado para entrar sem senha."
+        expectedFeatures={[
+          'Verificação automática do email de contato',
+          'Sem senha — só clicar no link recebido',
+          'Configuração de notificações por email',
+        ]}
+        backHref="/login"
+        backLabel="Voltar para login com GitHub"
+      />
+    )
+  }
 
   return (
     <main className="min-h-screen flex items-center justify-center px-6 py-12 bg-background">

@@ -17,10 +17,15 @@ declare module 'next-auth' {
  * não está pronto. Sem verificação de email, sem senha. Só funciona se
  * a empresa já foi aprovada pelo admin (User existe e Profile.type=COMPANY).
  *
+ * Em produção é OFF por padrão — precisa ser explicitamente ligado via
+ * ENABLE_DEV_COMPANY_LOGIN=true. Em dev é ON por padrão pra facilitar testes.
+ *
  * TODO Fase 2: substituir por Auth.js Email provider (magic link).
  */
 const ENABLE_DEV_COMPANY_LOGIN =
-  process.env.ENABLE_DEV_COMPANY_LOGIN !== 'false'
+  process.env.NODE_ENV === 'production'
+    ? process.env.ENABLE_DEV_COMPANY_LOGIN === 'true'
+    : process.env.ENABLE_DEV_COMPANY_LOGIN !== 'false'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
