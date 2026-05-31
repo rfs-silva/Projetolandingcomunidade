@@ -84,6 +84,12 @@ enum EventRegistrationStatus {
   CANCELLED
 }
 
+enum ContentStatus {
+  PENDING_APPROVAL
+  PUBLISHED
+  REJECTED
+}
+
 // ============================================================================
 // E1 - Auth & Users
 // ============================================================================
@@ -106,6 +112,10 @@ model User {
   challengeParticipations ChallengeParticipation[]
   eventRegistrations      EventRegistration[]
   reviewedCompanies       CompanyApplication[]      @relation("CompanyApplicationReviewer")
+  createdEvents           Event[]                   @relation("EventOwner")
+  reviewedEvents          Event[]                   @relation("EventReviewer")
+  createdChallenges       Challenge[]               @relation("ChallengeOwner")
+  reviewedChallenges      Challenge[]               @relation("ChallengeReviewer")
 }
 
 model Profile {
@@ -167,12 +177,21 @@ model Event {
   visibility  Visibility          @default(PUBLIC)
   imageIndex  Int
   points      Int                 @default(10)
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
+  status      ContentStatus       @default(PUBLISHED)
+  createdById String?
+  createdBy   User?               @relation("EventOwner", fields: [createdById], references: [id], onDelete: SetNull)
+  reviewerNote String?
+  reviewedById String?
+  reviewedBy   User?              @relation("EventReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt   DateTime?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
   registrations EventRegistration[]
 
   @@index([visibility])
   @@index([type])
+  @@index([status, createdAt])
+  @@index([createdById])
 }
 
 // ============================================================================
@@ -187,12 +206,21 @@ model Challenge {
   imageIndex    Int
   visibility    Visibility                @default(PUBLIC)
   points        Int                       @default(20)
+  status        ContentStatus             @default(PUBLISHED)
+  createdById   String?
+  createdBy     User?                     @relation("ChallengeOwner", fields: [createdById], references: [id], onDelete: SetNull)
+  reviewerNote  String?
+  reviewedById  String?
+  reviewedBy    User?                     @relation("ChallengeReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt    DateTime?
   createdAt     DateTime                  @default(now())
   updatedAt     DateTime                  @updatedAt
   tags          ChallengeTag[]
   participations ChallengeParticipation[]
 
   @@index([visibility])
+  @@index([status, createdAt])
+  @@index([createdById])
 }
 
 model ChallengeTag {

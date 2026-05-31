@@ -33,6 +33,7 @@ export const eventsRepository = {
   }: { type?: EventType; includeMembers?: boolean } = {}): Promise<EventDto[]> {
     const rows = await prisma.event.findMany({
       where: {
+        status: 'PUBLISHED',
         ...(type ? { type: toDbType(type) } : {}),
         ...(includeMembers ? {} : { visibility: 'PUBLIC' }),
       },
@@ -46,6 +47,7 @@ export const eventsRepository = {
       where: { number: normalize(num) },
     })
     if (!row) return null
+    if (row.status !== 'PUBLISHED') return null
     if (!includeMembers && row.visibility !== 'PUBLIC') return null
     return toDto(row)
   },

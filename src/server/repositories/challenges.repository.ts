@@ -34,7 +34,10 @@ export const challengesRepository = {
     includeMembers = false,
   }: { includeMembers?: boolean } = {}): Promise<ChallengeDto[]> {
     const rows = await prisma.challenge.findMany({
-      where: includeMembers ? {} : { visibility: 'PUBLIC' },
+      where: {
+        status: 'PUBLISHED',
+        ...(includeMembers ? {} : { visibility: 'PUBLIC' }),
+      },
       include: { tags: true },
       orderBy: { number: 'asc' },
     })
@@ -47,6 +50,7 @@ export const challengesRepository = {
       include: { tags: true },
     })
     if (!row) return null
+    if (row.status !== 'PUBLISHED') return null
     if (!includeMembers && row.visibility !== 'PUBLIC') return null
     return toDto(row)
   },

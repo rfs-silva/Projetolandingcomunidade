@@ -2,6 +2,7 @@ import 'server-only'
 import { auth } from '@/auth'
 import { prisma } from '@/server/lib/prisma'
 import { AppError } from '@/server/http/errors'
+import type { ProfileType } from '@/server/schemas/profile.schema'
 
 /**
  * Exige que a requisição venha de um usuário com perfil LEADER ou FOUNDER.
@@ -27,6 +28,18 @@ export async function requireAdminUserId(): Promise<string> {
  * (eventos e desafios). Retorna o userId.
  */
 export async function requireContentCreatorUserId(): Promise<string> {
+  const actor = await requireContentCreatorActor()
+  return actor.userId
+}
+
+/**
+ * Como requireContentCreatorUserId, mas retorna também o profileType
+ * pra que o service consiga aplicar checagens de ownership.
+ */
+export async function requireContentCreatorActor(): Promise<{
+  userId: string
+  profileType: ProfileType
+}> {
   const session = await auth()
   if (!session?.user?.id) {
     throw new AppError('UNAUTHORIZED', 'Não autenticado', 401)
@@ -47,5 +60,5 @@ export async function requireContentCreatorUserId(): Promise<string> {
       403,
     )
   }
-  return session.user.id
+  return { userId: session.user.id, profileType: profile.type }
 }

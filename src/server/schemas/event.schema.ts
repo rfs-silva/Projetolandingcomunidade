@@ -12,6 +12,10 @@ export const visibilitySchema = z
       'PUBLIC = visível na landing aberta; MEMBERS = só dentro do dashboard',
   })
 
+export const contentStatusSchema = z
+  .enum(['PENDING_APPROVAL', 'PUBLISHED', 'REJECTED'])
+  .openapi('ContentStatus')
+
 export const eventSchema = z
   .object({
     number: z.string().openapi({ example: '#01' }),
