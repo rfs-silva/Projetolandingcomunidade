@@ -58,8 +58,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const dbUser = await prisma.user.findUnique({ where: { githubId } })
         if (dbUser) {
           ;(token as { userId?: string }).userId = dbUser.id
-          ;(token as { githubUsername?: string }).githubUsername =
-            dbUser.githubUsername
+          if (dbUser.githubUsername) {
+            ;(token as { githubUsername?: string }).githubUsername =
+              dbUser.githubUsername
+          }
           if (dbUser.avatarUrl) token.picture = dbUser.avatarUrl
         }
       }

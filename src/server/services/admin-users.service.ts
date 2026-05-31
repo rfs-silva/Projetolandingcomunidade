@@ -12,7 +12,7 @@ export type AdminUserRow = {
   userId: string
   profileId: string
   displayName: string
-  githubUsername: string
+  githubUsername: string | null
   avatarUrl: string | null
   type: ProfileType
   location: string | null

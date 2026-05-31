@@ -59,8 +59,9 @@ export const adminProgressService = {
       points: r.challenge.points,
       user: {
         id: r.user.id,
-        displayName: r.user.profile?.displayName ?? r.user.githubUsername,
-        githubUsername: r.user.githubUsername,
+        displayName:
+          r.user.profile?.displayName ?? r.user.githubUsername ?? 'Sem nome',
+        githubUsername: r.user.githubUsername ?? 'sem-github',
         avatarUrl: r.user.avatarUrl,
       },
       submissionUrl: r.submissionUrl,
@@ -153,8 +154,9 @@ export const adminProgressService = {
       attendedAt: r.attendedAt,
       user: {
         id: r.user.id,
-        displayName: r.user.profile?.displayName ?? r.user.githubUsername,
-        githubUsername: r.user.githubUsername,
+        displayName:
+          r.user.profile?.displayName ?? r.user.githubUsername ?? 'Sem nome',
+        githubUsername: r.user.githubUsername ?? 'sem-github',
         avatarUrl: r.user.avatarUrl,
       },
     }))
@@ -233,8 +235,9 @@ export const adminProgressService = {
       reviewedAt: r.reviewedAt,
       user: {
         id: r.user.id,
-        displayName: r.user.profile?.displayName ?? r.user.githubUsername,
-        githubUsername: r.user.githubUsername,
+        displayName:
+          r.user.profile?.displayName ?? r.user.githubUsername ?? 'Sem nome',
+        githubUsername: r.user.githubUsername ?? 'sem-github',
         avatarUrl: r.user.avatarUrl,
       },
     }))

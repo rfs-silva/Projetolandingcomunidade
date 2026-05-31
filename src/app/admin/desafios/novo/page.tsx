@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowLeft, Plus } from 'lucide-react'
-import { requireAdminSession } from '@/server/lib/admin-session'
+import { requireContentCreatorSession } from '@/server/lib/admin-session'
 import { ChallengeForm } from '../ChallengeForm'
 
 export const metadata = {
@@ -10,7 +10,7 @@ export const metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function NewChallengePage() {
-  await requireAdminSession()
+  await requireContentCreatorSession()
 
   return (
     <div className="flex flex-col gap-6 max-w-2xl">

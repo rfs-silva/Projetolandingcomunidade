@@ -377,8 +377,9 @@ export const progressService = {
         const agg = byUser.get(u.id)!
         return {
           userId: u.id,
-          displayName: u.profile?.displayName ?? u.githubUsername,
-          githubUsername: u.githubUsername,
+          displayName:
+            u.profile?.displayName ?? u.githubUsername ?? 'Sem nome',
+          githubUsername: u.githubUsername ?? 'sem-github',
           avatarUrl: u.avatarUrl,
           ...agg,
         }

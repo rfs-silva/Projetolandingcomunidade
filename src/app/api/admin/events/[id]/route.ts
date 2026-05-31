@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { adminEventsService } from '@/server/services/admin-events.service'
-import { requireAdminUserId } from '@/server/http/admin'
+import { requireContentCreatorUserId } from '@/server/http/admin'
 import { ok } from '@/server/http/response'
 import { handleError } from '@/server/http/errors'
 
@@ -11,7 +11,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    await requireAdminUserId()
+    await requireContentCreatorUserId()
     const { id } = await params
     const body = await request.json()
     const updated = await adminEventsService.update(id, body)
@@ -26,7 +26,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    await requireAdminUserId()
+    await requireContentCreatorUserId()
     const { id } = await params
     await adminEventsService.remove(id)
     return new NextResponse(null, { status: 204 })

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowLeft, Pencil } from 'lucide-react'
-import { requireAdminSession } from '@/server/lib/admin-session'
+import { requireContentCreatorSession } from '@/server/lib/admin-session'
 import { adminEventsService } from '@/server/services/admin-events.service'
 import { EventForm } from '../../EventForm'
 
@@ -15,7 +15,7 @@ export default async function EditEventPage({
 }: {
   params: Promise<{ id: string }>
 }) {
-  await requireAdminSession()
+  await requireContentCreatorSession()
   const { id } = await params
   const event = await adminEventsService.getById(id)
 

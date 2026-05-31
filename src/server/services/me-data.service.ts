@@ -15,8 +15,8 @@ export type ExportPayload = {
   }
   account: {
     id: string
-    githubId: string
-    githubUsername: string
+    githubId: string | null
+    githubUsername: string | null
     email: string | null
     avatarUrl: string | null
     acceptedTermsAt: string | null
@@ -114,7 +114,7 @@ export const meDataService = {
       exportedAt: exportedAt.toISOString(),
       schemaVersion: '1.0',
       controller: {
-        name: 'Comunidade Roraima Devs',
+        name: 'Comunidade Roraima Fullstack Developers',
         dpoContact: 'privacidade@comunidaderoraima.dev',
         notice:
           'Exportação realizada conforme art. 18 II e V da LGPD. Para dúvidas, contate o DPO.',

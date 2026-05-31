@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowLeft, Pencil } from 'lucide-react'
-import { requireAdminSession } from '@/server/lib/admin-session'
+import { requireContentCreatorSession } from '@/server/lib/admin-session'
 import { adminChallengesService } from '@/server/services/admin-challenges.service'
 import { ChallengeForm } from '../../ChallengeForm'
 
@@ -15,7 +15,7 @@ export default async function EditChallengePage({
 }: {
   params: Promise<{ id: string }>
 }) {
-  await requireAdminSession()
+  await requireContentCreatorSession()
   const { id } = await params
   const challenge = await adminChallengesService.getById(id)
 

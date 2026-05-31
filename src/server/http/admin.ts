@@ -21,3 +21,31 @@ export async function requireAdminUserId(): Promise<string> {
   }
   return session.user.id
 }
+
+/**
+ * Exige LEADER, FOUNDER ou COMPANY — para endpoints de criação de conteúdo
+ * (eventos e desafios). Retorna o userId.
+ */
+export async function requireContentCreatorUserId(): Promise<string> {
+  const session = await auth()
+  if (!session?.user?.id) {
+    throw new AppError('UNAUTHORIZED', 'Não autenticado', 401)
+  }
+  const profile = await prisma.profile.findUnique({
+    where: { userId: session.user.id },
+    select: { type: true },
+  })
+  if (
+    !profile ||
+    (profile.type !== 'LEADER' &&
+      profile.type !== 'FOUNDER' &&
+      profile.type !== 'COMPANY')
+  ) {
+    throw new AppError(
+      'FORBIDDEN',
+      'Acesso restrito a lideranças e empresas parceiras',
+      403,
+    )
+  }
+  return session.user.id
+}

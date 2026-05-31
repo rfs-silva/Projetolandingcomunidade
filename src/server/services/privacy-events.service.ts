@@ -8,8 +8,8 @@ type RecordInput = {
   type: PrivacyEventType
   subject: {
     userId?: string | null
-    githubId: string
-    githubUsername: string
+    githubId: string | null
+    githubUsername: string | null
   }
   actor?: {
     userId: string
@@ -25,8 +25,8 @@ export const privacyEventsService = {
         data: {
           type: input.type,
           subjectUserId: input.subject.userId ?? null,
-          subjectGithubId: input.subject.githubId,
-          subjectUsername: input.subject.githubUsername,
+          subjectGithubId: input.subject.githubId ?? '',
+          subjectUsername: input.subject.githubUsername ?? '',
           actorUserId: input.actor?.userId ?? null,
           actorGithubId: input.actor?.githubId ?? null,
           ...(input.metadata !== undefined

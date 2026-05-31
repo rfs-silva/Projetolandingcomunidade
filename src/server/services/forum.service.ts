@@ -35,14 +35,15 @@ const AUTHOR_INCLUDE = {
 
 function authorToDto(user: {
   id: string
-  githubUsername: string
+  githubUsername: string | null
   avatarUrl: string | null
   profile: { displayName: string } | null
 }) {
   return {
     id: user.id,
-    displayName: user.profile?.displayName ?? user.githubUsername,
-    githubUsername: user.githubUsername,
+    displayName:
+      user.profile?.displayName ?? user.githubUsername ?? 'Sem nome',
+    githubUsername: user.githubUsername ?? 'sem-github',
     avatarUrl: user.avatarUrl,
   }
 }

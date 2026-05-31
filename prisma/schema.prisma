@@ -90,21 +90,22 @@ enum EventRegistrationStatus {
 
 model User {
   id              String    @id @default(uuid())
-  githubId        String    @unique
-  githubUsername  String    @unique
+  githubId        String?   @unique
+  githubUsername  String?   @unique
   email           String?   @unique
   avatarUrl       String?
   acceptedTermsAt DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  profile                Profile?
-  mentorshipApplications MentorshipApplication[]
-  projects               UserProject[]
-  forumThreads           ForumThread[]
-  forumReplies           ForumReply[]
+  profile                 Profile?
+  mentorshipApplications  MentorshipApplication[]
+  projects                UserProject[]
+  forumThreads            ForumThread[]
+  forumReplies            ForumReply[]
   challengeParticipations ChallengeParticipation[]
-  eventRegistrations     EventRegistration[]
+  eventRegistrations      EventRegistration[]
+  reviewedCompanies       CompanyApplication[]      @relation("CompanyApplicationReviewer")
 }
 
 model Profile {
@@ -359,4 +360,45 @@ model EventRegistration {
   @@unique([userId, eventId])
   @@index([status])
   @@index([eventId, status])
+}
+
+// ============================================================================
+// Onboarding de empresas sem GitHub
+// ============================================================================
+
+enum CompanyApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model CompanyApplication {
+  id              String                   @id @default(uuid())
+  companyName     String
+  contactName     String
+  email           String
+  website         String?
+  linkedinUrl     String?
+  description     String
+  status          CompanyApplicationStatus @default(PENDING)
+  reviewerNote    String?
+  reviewedById    String?
+  reviewedBy      User?                    @relation("CompanyApplicationReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt      DateTime?
+  approvedUserId  String?                  @unique
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
+  @@index([status, createdAt])
+  @@index([email])
+}
+
+// Tabela usada pelo provider de email do Auth.js (magic link).
+// Mantida desde já para reduzir migration churn quando ligarmos o email.
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }

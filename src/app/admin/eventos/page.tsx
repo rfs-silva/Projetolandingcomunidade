@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Calendar, Lock, Pencil, Plus, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { requireAdminSession } from '@/server/lib/admin-session'
+import { requireContentCreatorSession } from '@/server/lib/admin-session'
 import { adminEventsService } from '@/server/services/admin-events.service'
 import { cn } from '@/lib/utils'
 import { DeleteButton } from './DeleteButton'
@@ -13,7 +13,7 @@ export const metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function AdminEventsPage() {
-  await requireAdminSession()
+  await requireContentCreatorSession()
   const events = await adminEventsService.list()
 
   return (
