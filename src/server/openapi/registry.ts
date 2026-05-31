@@ -639,6 +639,14 @@ export function generateOpenApiDocument() {
     },
     servers: [
       { url: 'http://localhost:3000', description: 'Local' },
+      ...(process.env.NEXT_PUBLIC_API_URL
+        ? [
+            {
+              url: process.env.NEXT_PUBLIC_API_URL,
+              description: 'Produção',
+            },
+          ]
+        : []),
     ],
     tags: [
       { name: 'Public', description: 'Sem autenticação' },

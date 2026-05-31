@@ -41,6 +41,14 @@ services:
       - ENABLE_DEV_COMPANY_LOGIN=${ENABLE_DEV_COMPANY_LOGIN:-}
       # URL pública usada em sitemap/robots e canonical tags.
       - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-}
+      # URL base do subdomínio de API (https://api-rrfullstack.sistemasme.com).
+      # Adicionado ao CSP connect-src e listado no OpenAPI.
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-}
+      # Domínio do cookie de sessão. Use o apex (ex.: .sistemasme.com) pra
+      # compartilhar sessão entre frontend e subdomínio de API.
+      - AUTH_COOKIE_DOMAIN=${AUTH_COOKIE_DOMAIN:-}
+      # Lista de origens autorizadas a fazer CORS no /api (separadas por vírgula).
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-}
       # Roda seed mesmo em produção (use só pra bootstrap inicial).
       - RUN_SEED=${RUN_SEED:-}
     depends_on:

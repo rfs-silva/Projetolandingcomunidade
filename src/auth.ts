@@ -27,7 +27,39 @@ const ENABLE_DEV_COMPANY_LOGIN =
     ? process.env.ENABLE_DEV_COMPANY_LOGIN === 'true'
     : process.env.ENABLE_DEV_COMPANY_LOGIN !== 'false'
 
+/**
+ * Domínio do cookie de sessão. Configurar quando frontend e API rodam em
+ * subdomínios diferentes do mesmo apex (ex.: `.sistemasme.com` cobre
+ * `rrfullstack.sistemasme.com` e `api-rrfullstack.sistemasme.com`).
+ * Em dev fica indefinido, e o browser trata como host-only (localhost).
+ */
+const AUTH_COOKIE_DOMAIN = process.env.AUTH_COOKIE_DOMAIN || undefined
+
+/**
+ * Em produção, o cookie de sessão é `__Secure-` prefixed e Secure-only.
+ * Em dev (http://localhost) usa nome simples e sem Secure pra funcionar
+ * sem TLS.
+ */
+const useSecureCookie = process.env.NODE_ENV === 'production'
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  // Confia em proxy reverso (Caddy/nginx) — Auth.js usa X-Forwarded-Host
+  // para montar callback URLs e validar host.
+  trustHost: true,
+  cookies: {
+    sessionToken: {
+      name: useSecureCookie
+        ? '__Secure-authjs.session-token'
+        : 'authjs.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: useSecureCookie,
+        ...(AUTH_COOKIE_DOMAIN ? { domain: AUTH_COOKIE_DOMAIN } : {}),
+      },
+    },
+  },
   providers: [
     GitHub({
       clientId: process.env.AUTH_GITHUB_ID,

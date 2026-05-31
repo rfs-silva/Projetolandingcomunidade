@@ -1,0 +1,56 @@
+# Caddy reverse proxy com TLS automático (Let's Encrypt).
+#
+# Configuração mínima pra rodar atrás de Caddy em um VPS / container ao
+# lado do app Next.js. Caddy escuta nas portas 80/443, emite e renova
+# certificados automaticamente, e encaminha pra app na porta interna 3000.
+#
+# Como usar:
+#   1. Defina os dois domínios apontando pro IP do servidor (A records)
+#   2. Suba o container do app primeiro (docker compose up -d)
+#   3. Rode caddy: caddy run --config Caddyfile
+#      (ou via docker: caddy:2-alpine como serviço extra)
+#
+# Tanto rrfullstack.sistemasme.com quanto api-rrfullstack.sistemasme.com
+# apontam pro mesmo app — o middleware Next.js cuida de redirecionar
+# rotas não-API que cheguem no subdomínio api-.
+
+{
+	# Em produção, deixe o email pra notificações da Let's Encrypt:
+	# email contato@sistemasme.com
+	auto_https disable_redirects
+}
+
+rrfullstack.sistemasme.com, api-rrfullstack.sistemasme.com {
+	encode gzip zstd
+
+	# Confia em proxies Cloudflare/etc. se estiver atrás de mais um CDN.
+	# Sem isso, o `X-Forwarded-For` vira o IP do CDN, não do cliente.
+	# trusted_proxies static <IPs>
+
+	# Repassa cabeçalhos importantes pro Next.js (Auth.js precisa pra
+	# montar callback URLs corretas e validar X-Forwarded-Host).
+	reverse_proxy localhost:3000 {
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Forwarded-Host {host}
+	}
+
+	# Cabeçalhos de segurança extra (Next middleware já manda quase tudo,
+	# mas Caddy garante pra responses estáticas servidas direto).
+	header {
+		# HSTS por 2 anos com preload (mesmo valor do middleware)
+		Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+		# Remove cabeçalhos que vazam stack
+		-Server
+		-X-Powered-By
+	}
+
+	# Logs estruturados (rotativos) pra triagem de incidentes
+	log {
+		output file /var/log/caddy/access.log {
+			roll_size 50mb
+			roll_keep 5
+		}
+		format json
+	}
+}

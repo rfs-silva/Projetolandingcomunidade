@@ -281,3 +281,105 @@ Funcionalidades intencionalmente marcadas como "em desenvolvimento" no UI até s
 - [ ] DNS + SSL (Let's Encrypt ou similar)
 - [ ] Termos de Uso e Política de Privacidade revisados por alguém habilitado
 - [ ] Backup do Postgres configurado (snapshot diário pelo menos)
+
+## Deploy em produção (setup oficial)
+
+A plataforma roda em **dois subdomínios apontando pro mesmo app Next.js**:
+
+- **Frontend**: `https://rrfullstack.sistemasme.com`
+- **API**: `https://api-rrfullstack.sistemasme.com`
+
+O middleware redireciona rotas não-API que cheguem no subdomínio `api-`
+de volta pro frontend, e configura CORS + cookie compartilhado entre os
+dois via `AUTH_COOKIE_DOMAIN=.sistemasme.com`.
+
+### Passo 1 — DNS
+
+No painel do seu provedor, criar dois A records apontando pro IP do
+servidor (ou um A + CNAME):
+
+| Nome                    | Tipo  | Valor                |
+| ----------------------- | ----- | -------------------- |
+| `rrfullstack`           | A     | `IP do servidor`     |
+| `api-rrfullstack`       | A     | `IP do servidor`     |
+
+> Espera 5–30 minutos pra propagação. Verifica com `dig rrfullstack.sistemasme.com +short`.
+
+### Passo 2 — GitHub OAuth App de produção
+
+1. https://github.com/settings/developers → **New OAuth App**
+2. **Homepage URL**: `https://rrfullstack.sistemasme.com`
+3. **Authorization callback URL**: `https://rrfullstack.sistemasme.com/api/auth/callback/github`
+4. Gere `Client ID` e `Client Secret`; use um App diferente do de dev.
+
+### Passo 3 — Variáveis de ambiente
+
+```bash
+cp .env.production.example .env
+```
+
+Preencha os marcadores `__TROCAR_POR_...__`. Variáveis críticas:
+
+- `AUTH_SECRET` — gere com `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`
+- `AUTH_URL=https://rrfullstack.sistemasme.com`
+- `AUTH_COOKIE_DOMAIN=.sistemasme.com` (compartilha cookie entre subdomínios)
+- `AUTH_GITHUB_ID` / `AUTH_GITHUB_SECRET` — do App de produção
+- `DATABASE_URL` — Postgres com `?sslmode=require`
+- `NEXT_PUBLIC_SITE_URL=https://rrfullstack.sistemasme.com`
+- `NEXT_PUBLIC_API_URL=https://api-rrfullstack.sistemasme.com`
+- `ALLOWED_ORIGINS=https://rrfullstack.sistemasme.com,https://api-rrfullstack.sistemasme.com`
+- `DPO_EMAIL` — endereço real monitorado
+
+### Passo 4 — Subir o app
+
+```bash
+docker compose up -d --build
+docker compose logs -f web   # confirma migrations + start
+```
+
+Na PRIMEIRA execução (DB vazio), opcionalmente setar `RUN_SEED=true` no `.env`
+para criar dados de bootstrap. Remover depois.
+
+### Passo 5 — Reverse proxy com TLS (Caddy)
+
+Use o [Caddyfile](./Caddyfile) que já vem no repositório. Caddy emite e
+renova certificados Let's Encrypt automaticamente. Instalar Caddy no
+host:
+
+```bash
+# Debian/Ubuntu
+sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+sudo apt update && sudo apt install caddy
+
+# Rodar com o Caddyfile do repo
+sudo caddy run --config /caminho/para/Caddyfile
+```
+
+Caddy escuta nas portas 80/443 e proxia tudo pro app na porta 3000.
+
+### Passo 6 — Verificação pós-deploy
+
+```bash
+# DNS resolve corretamente?
+dig +short rrfullstack.sistemasme.com api-rrfullstack.sistemasme.com
+
+# Frontend responde?
+curl -I https://rrfullstack.sistemasme.com
+
+# Headers de segurança presentes?
+curl -sI https://rrfullstack.sistemasme.com | grep -iE 'strict-transport|content-security|x-frame|x-content-type'
+
+# /api/auth/csrf existe?
+curl -s https://rrfullstack.sistemasme.com/api/auth/csrf
+
+# Subdomínio de API redireciona root pra frontend?
+curl -sI https://api-rrfullstack.sistemasme.com/   # esperado: 308 → rrfullstack...
+
+# OpenAPI lista servidor de prod?
+curl -s https://api-rrfullstack.sistemasme.com/api/openapi.json | jq '.servers'
+```
+
+Recomendado rodar [securityheaders.com](https://securityheaders.com) e
+[Mozilla Observatory](https://observatory.mozilla.org) contra a URL.
