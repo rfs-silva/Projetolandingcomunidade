@@ -5,7 +5,7 @@ import { tagsService } from '@/server/services/tags.service'
 import { ProjectForm } from '../ProjectForm'
 
 export const metadata = {
-  title: 'Novo projeto · Comunidade Roraima',
+  title: 'Novo projeto',
 }
 
 export const dynamic = 'force-dynamic'

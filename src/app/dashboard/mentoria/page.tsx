@@ -22,7 +22,7 @@ import { MentorshipForm } from './MentorshipForm'
 import { cn } from '@/lib/utils'
 
 export const metadata = {
-  title: 'Mentoria · Comunidade Roraima',
+  title: 'Mentoria',
 }
 
 export const dynamic = 'force-dynamic'

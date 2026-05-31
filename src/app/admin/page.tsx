@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import {
   ArrowRight,
+  Building2,
   Calendar,
   CheckCircle2,
   Clock,
@@ -15,12 +16,17 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react'
+import { redirect } from 'next/navigation'
 import { adminStatsService } from '@/server/services/admin-stats.service'
 import { adminProgressService } from '@/server/services/admin-progress.service'
-import { requireAdminSession } from '@/server/lib/admin-session'
+import { companiesService } from '@/server/services/companies.service'
+import {
+  isAdminType,
+  requireContentCreatorSession,
+} from '@/server/lib/admin-session'
 
 export const metadata = {
-  title: 'Admin · Comunidade Roraima',
+  title: 'Admin',
 }
 
 export const dynamic = 'force-dynamic'
@@ -40,13 +46,18 @@ const TYPE_ICON: Record<string, React.ReactNode> = {
 }
 
 export default async function AdminHomePage() {
-  const session = await requireAdminSession()
-  const [stats, pendingSubmissions] = await Promise.all([
+  const session = await requireContentCreatorSession()
+  if (!isAdminType(session.profile.type)) {
+    redirect('/admin/eventos')
+  }
+  const [stats, pendingSubmissions, pendingCompanies] = await Promise.all([
     adminStatsService.load(),
     adminProgressService.countPendingSubmissions(),
+    companiesService.countPending(),
   ])
 
-  const pendingTotal = pendingSubmissions + stats.mentorship.pending
+  const pendingTotal =
+    pendingSubmissions + stats.mentorship.pending + pendingCompanies
   const firstName = session.profile.displayName.split(' ')[0]
 
   return (
@@ -95,7 +106,7 @@ export default async function AdminHomePage() {
       {/* Pendencias de acao */}
       <section>
         <SectionTitle title="Aguardando ação" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <ActionCard
             href="/admin/submissoes"
             icon={<Send size={20} />}
@@ -109,6 +120,13 @@ export default async function AdminHomePage() {
             title="Candidaturas de mentoria"
             count={stats.mentorship.pending}
             description="Triar mentores e mentorados aguardando análise."
+          />
+          <ActionCard
+            href="/admin/empresas?status=PENDING"
+            icon={<Building2 size={20} />}
+            title="Candidaturas de empresa"
+            count={pendingCompanies}
+            description="Avaliar empresas que querem participar da comunidade."
           />
         </div>
       </section>
@@ -141,6 +159,11 @@ export default async function AdminHomePage() {
             href="/admin/submissoes"
             icon={<Send size={18} />}
             label="Submissões"
+          />
+          <ShortcutCard
+            href="/admin/empresas"
+            icon={<Building2 size={18} />}
+            label="Empresas"
           />
           <ShortcutCard
             href="/admin/forum"

@@ -16,7 +16,7 @@ export function DashboardHeader({ image, displayName, seed }: Props) {
         <Link href="/" className="flex items-center gap-3">
           <Image src="/logo.svg" alt="Comunidade" width={32} height={32} />
           <span className="text-sm font-medium text-foreground">
-            Comunidade Roraima
+            Comunidade Roraima Fullstack Developers
           </span>
         </Link>
         <div className="flex items-center gap-4">

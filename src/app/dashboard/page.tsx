@@ -18,7 +18,7 @@ import { requireDashboardSession } from '@/server/lib/dashboard-session'
 import { isAdminType } from '@/server/lib/admin-session'
 
 export const metadata = {
-  title: 'Painel · Comunidade Roraima',
+  title: 'Painel',
 }
 
 export const dynamic = 'force-dynamic'

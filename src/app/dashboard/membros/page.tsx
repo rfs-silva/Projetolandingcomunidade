@@ -10,7 +10,7 @@ import { MembersFilters } from './MembersFilters'
 import { cn } from '@/lib/utils'
 
 export const metadata = {
-  title: 'Mural de membros · Comunidade Roraima',
+  title: 'Mural de membros',
 }
 
 export const dynamic = 'force-dynamic'

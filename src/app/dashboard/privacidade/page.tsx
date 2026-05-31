@@ -14,7 +14,7 @@ import { privacyEventsService } from '@/server/services/privacy-events.service'
 import { DeleteAccountForm } from './DeleteAccountForm'
 
 export const metadata = {
-  title: 'Privacidade · Comunidade Roraima',
+  title: 'Privacidade',
 }
 
 export const dynamic = 'force-dynamic'

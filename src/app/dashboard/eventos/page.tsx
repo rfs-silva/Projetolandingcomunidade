@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import { EventRegistrationButton } from '@/components/dashboard/EventRegistrationButton'
 
 export const metadata = {
-  title: 'Eventos · Comunidade Roraima',
+  title: 'Eventos',
 }
 
 export const dynamic = 'force-dynamic'

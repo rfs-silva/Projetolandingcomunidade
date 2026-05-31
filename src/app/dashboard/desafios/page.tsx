@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import { ChallengeActionButton } from '@/components/dashboard/ChallengeActionButton'
 
 export const metadata = {
-  title: 'Desafios · Comunidade Roraima',
+  title: 'Desafios',
 }
 
 export const dynamic = 'force-dynamic'

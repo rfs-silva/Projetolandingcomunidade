@@ -13,7 +13,7 @@ import {
 import { cn } from '@/lib/utils'
 
 export const metadata = {
-  title: 'Fórum · Comunidade Roraima',
+  title: 'Fórum',
 }
 
 export const dynamic = 'force-dynamic'

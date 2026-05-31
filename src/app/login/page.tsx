@@ -6,7 +6,7 @@ import { auth, signIn } from '@/auth'
 import { Button } from '@/components/ui/button'
 
 export const metadata = {
-  title: 'Entrar · Comunidade Roraima',
+  title: 'Entrar',
 }
 
 export const dynamic = 'force-dynamic'
@@ -70,6 +70,18 @@ export default async function LoginPage({
         <p className="text-center text-xs text-muted-foreground">
           Ao continuar você concorda com nossos Termos e Política de Privacidade.
         </p>
+
+        <div className="border-t border-subtle pt-6 text-center">
+          <p className="text-xs text-muted-foreground">
+            Empresa sem GitHub?
+          </p>
+          <Link
+            href="/empresa/cadastro"
+            className="mt-1 inline-flex text-sm text-primary-destaque hover:underline"
+          >
+            Candidatar a empresa →
+          </Link>
+        </div>
 
         <Link
           href="/"

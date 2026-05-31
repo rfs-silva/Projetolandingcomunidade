@@ -7,7 +7,7 @@ import { UserAvatar } from '@/components/ui/UserAvatar'
 import { profileService } from '@/server/services/profile.service'
 
 export const metadata = {
-  title: 'Complete seu perfil · Comunidade Roraima',
+  title: 'Complete seu perfil',
 }
 
 export const dynamic = 'force-dynamic'

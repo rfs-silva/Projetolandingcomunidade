@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Política de Privacidade · Comunidade Roraima',
+  title: 'Política de Privacidade',
 }
 
 const DPO_EMAIL = 'privacidade@comunidaderoraima.dev'
@@ -28,7 +28,7 @@ export default function PrivacidadePage() {
         <section className="prose prose-invert mt-10 max-w-none text-foreground/90 space-y-6">
           <h2 className="text-xl font-semibold">1. Quem somos (Controlador)</h2>
           <p>
-            A <strong>Comunidade Roraima Devs</strong> é a controladora dos
+            A <strong>Comunidade Roraima Fullstack Developers</strong> é a controladora dos
             dados pessoais aqui descritos, nos termos do art. 5º, VI, da LGPD.
             Para qualquer comunicação sobre dados pessoais, use o canal do
             encarregado (DPO) na seção 10.

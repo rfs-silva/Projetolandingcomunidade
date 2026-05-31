@@ -8,7 +8,7 @@ import { projectsService } from '@/server/services/projects.service'
 import { cn } from '@/lib/utils'
 
 export const metadata = {
-  title: 'Meus projetos · Comunidade Roraima',
+  title: 'Meus projetos',
 }
 
 export const dynamic = 'force-dynamic'

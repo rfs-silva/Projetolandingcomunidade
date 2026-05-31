@@ -3,7 +3,7 @@ import { ArrowLeft, FileJson } from 'lucide-react'
 import { SwaggerUI } from './SwaggerUI'
 
 export const metadata = {
-  title: 'API · Comunidade Roraima',
+  title: 'API',
   description: 'Documentação interativa da API REST.',
 }
 
@@ -23,7 +23,7 @@ export default function ApiDocsPage() {
             </Link>
             <span className="text-zinc-700">·</span>
             <h1 className="text-base font-semibold text-foreground">
-              API REST · Comunidade Roraima
+              API REST · Comunidade Roraima Fullstack Developers
             </h1>
           </div>
           <Link

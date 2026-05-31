@@ -8,7 +8,7 @@ import { profileService } from '@/server/services/profile.service'
 import { tagsService } from '@/server/services/tags.service'
 
 export const metadata = {
-  title: 'Meu perfil · Comunidade Roraima',
+  title: 'Meu perfil',
 }
 
 export const dynamic = 'force-dynamic'

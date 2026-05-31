@@ -52,18 +52,18 @@ const Footer: React.FC = () => {
           >
             <Image
               src="/logo.svg"
-              alt="Comunidade Roraima Devs"
+              alt="Comunidade Roraima Fullstack Developers"
               width={48}
               height={48}
               priority
               className="h-12 w-12 transition-transform group-hover:scale-110 duration-500"
             />
             <div className="flex flex-col items-center mt-2">
-              <span className="font-bold text-[10px] tracking-widest text-muted-secondary group-hover:text-zinc-300 transition-colors">
-                COMUNIDADE
-              </span>
               <span className="font-bold text-[10px] tracking-widest text-primary group-hover:text-primary-destaque transition-colors">
-                RORAIMA DEVS
+                COMUNIDADE RORAIMA
+              </span>
+              <span className="font-bold text-[10px] tracking-widest text-muted-secondary group-hover:text-zinc-300 transition-colors">
+                FULLSTACK DEVELOPERS
               </span>
             </div>
           </Link>
@@ -88,7 +88,7 @@ const Footer: React.FC = () => {
 
         <div className="flex flex-col md:flex-row items-center gap-4 text-center">
           <p className="text-muted text-xs md:text-sm">
-            © {new Date().getFullYear()} Comunidade Roraima Devs.
+            © {new Date().getFullYear()} Comunidade Roraima Fullstack Developers.
           </p>
           <span className="hidden md:block text-zinc-800">•</span>
           <p className="text-muted text-xs md:text-sm">

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Termos de Uso · Comunidade Roraima',
+  title: 'Termos de Uso',
 }
 
 export default function TermosPage() {
@@ -36,7 +36,7 @@ export default function TermosPage() {
 
           <h2 className="text-xl font-semibold">2. Sobre a comunidade</h2>
           <p>
-            A Comunidade Roraima Devs é um espaço colaborativo destinado a
+            A Comunidade Roraima Fullstack Developers é um espaço colaborativo destinado a
             desenvolvedores, empresas e lideranças do ecossistema de
             tecnologia de Roraima. Oferecemos eventos, desafios, mentoria,
             mural de membros, mural de projetos e fórum.

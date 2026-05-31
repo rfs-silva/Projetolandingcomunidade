@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Comunidade Roraima Devs',
-    template: '%s · Comunidade Roraima',
+    default: 'Comunidade Roraima Fullstack Developers',
+    template: '%s · Comunidade Roraima Fullstack Developers',
   },
   description:
     'Comunidade de desenvolvedores de Roraima. Mentoria, desafios, eventos e projetos.',

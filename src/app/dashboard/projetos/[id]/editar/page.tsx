@@ -13,7 +13,7 @@ import type {
 import { ProjectForm } from '../../ProjectForm'
 
 export const metadata = {
-  title: 'Editar projeto · Comunidade Roraima',
+  title: 'Editar projeto',
 }
 
 export const dynamic = 'force-dynamic'

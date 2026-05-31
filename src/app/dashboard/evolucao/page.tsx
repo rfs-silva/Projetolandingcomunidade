@@ -47,7 +47,7 @@ function getLevel(points: number) {
 }
 
 export const metadata = {
-  title: 'Minha evolução · Comunidade Roraima',
+  title: 'Minha evolução',
 }
 
 export const dynamic = 'force-dynamic'
